@@ -1,4 +1,4 @@
-### Desarrollo Del Trabajo del Panol
+## Desarrollo Del Trabajo del Panol
 
-### AGREGAR ANTES DE PRESENTAR
+## AGREGAR ANTES DE PRESENTAR
 **Github Profe** Profevivitasol
