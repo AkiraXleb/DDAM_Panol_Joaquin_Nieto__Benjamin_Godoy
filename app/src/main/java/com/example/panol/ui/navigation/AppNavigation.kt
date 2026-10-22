@@ -10,7 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.panol.ui.screen.CatalogoScreen
+import com.example.panol.ui.screen.DetalleScreen
 import com.example.panol.ui.screen.LoginScreen
+import com.example.panol.ui.screen.PerfilScreen
 
 object Routes {
     const val LOGIN = "login"
@@ -25,6 +27,13 @@ object Routes {
 fun AppNavigation() {
     val navController = rememberNavController()
 
+    // Navegación de la barra inferior: volver al Catálogo no lo duplica en la pila
+    val navegar: (String) -> Unit = { ruta ->
+        navController.navigate(ruta) {
+            popUpTo(Routes.CATALOGO) { inclusive = ruta == Routes.CATALOGO }
+        }
+    }
+
     NavHost(navController = navController, startDestination = Routes.LOGIN) {
         composable(Routes.LOGIN) {
             LoginScreen(onLoginSuccess = {
@@ -36,17 +45,27 @@ fun AppNavigation() {
         composable(Routes.CATALOGO) {
             CatalogoScreen(
                 onVerDetalle = { navController.navigate(Routes.DETALLE) },
-                onNavegar = { ruta ->
-                    navController.navigate(ruta) {
-                        popUpTo(Routes.CATALOGO) { inclusive = ruta == Routes.CATALOGO }
+                onNavegar = navegar
+            )
+        }
+        composable(Routes.DETALLE) {
+            DetalleScreen(
+                onVolver = { navController.popBackStack() },
+                onAgregado = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.CARRITO) { Pendiente("Carrito") }
+        composable(Routes.MIS_SOLICITUDES) { Pendiente("Mis Solicitudes") }
+        composable(Routes.PERFIL) {
+            PerfilScreen(
+                onNavegar = navegar,
+                onCerrarSesion = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.CATALOGO) { inclusive = true }
                     }
                 }
             )
         }
-        composable(Routes.DETALLE) { Pendiente("Detalle") }
-        composable(Routes.CARRITO) { Pendiente("Carrito") }
-        composable(Routes.MIS_SOLICITUDES) { Pendiente("Mis Solicitudes") }
-        composable(Routes.PERFIL) { Pendiente("Perfil") }
     }
 }
 
