@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.panol.R
+import androidx.compose.ui.graphics.Color
 import com.example.panol.data.EstadoEquipo
+import com.example.panol.data.EstadoSolicitud
 import com.example.panol.ui.theme.DisponibleFondo
 import com.example.panol.ui.theme.DisponibleTexto
 import com.example.panol.ui.theme.MantenimientoFondo
@@ -28,10 +30,28 @@ fun ChipEstado(estado: String) {
         EstadoEquipo.PRESTADO -> PrestadoFondo to PrestadoTexto
         else -> MantenimientoFondo to MantenimientoTexto
     }
+    Pildora(estado, fondo, texto)
+}
+
+// Chip de color según el estado de la solicitud (Confirmación y Mis Solicitudes)
+@Composable
+fun ChipEstadoSolicitud(estado: String) {
+    val (fondo, texto) = when (estado) {
+        EstadoSolicitud.PENDIENTE -> ReservadoFondo to ReservadoTexto
+        EstadoSolicitud.ACEPTADA, EstadoSolicitud.DEVUELTA -> DisponibleFondo to DisponibleTexto
+        EstadoSolicitud.ENTREGADA -> PrestadoFondo to PrestadoTexto
+        else -> MantenimientoFondo to MantenimientoTexto   // Rechazada, Cancelada
+    }
+    Pildora(estado, fondo, texto)
+}
+
+// Píldora con fondo y texto de color
+@Composable
+private fun Pildora(texto: String, fondo: Color, colorTexto: Color) {
     Surface(color = fondo, shape = RoundedCornerShape(50)) {
         Text(
-            text = estado,
-            color = texto,
+            text = texto,
+            color = colorTexto,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
