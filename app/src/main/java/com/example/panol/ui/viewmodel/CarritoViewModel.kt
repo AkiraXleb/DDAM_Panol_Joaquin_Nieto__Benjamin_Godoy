@@ -13,12 +13,13 @@ import com.example.panol.data.local.entity.CarritoItemEntity
 import com.example.panol.ui.model.CarritoModel
 import kotlinx.coroutines.launch
 
+// ViewModel del Carrito: cantidades y eliminación de items
 class CarritoViewModel : ViewModel() {
 
     var uiState by mutableStateOf(CarritoModel())
         private set
 
-    // Lee los items del carrito y los equipos (para el stock) desde Room
+    // Lee los items del carrito y los equipos desde Room
     fun cargarCarrito(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
@@ -30,7 +31,7 @@ class CarritoViewModel : ViewModel() {
         }
     }
 
-    // Suma 1 unidad respetando el máximo (3 y stock)
+    // Suma 1 unidad sin pasar el máximo
     fun onMasClick(context: Context, item: CarritoItemEntity) {
         val maximo = uiState.maximoDe(item)
         if (item.cantidad >= maximo) {
@@ -40,7 +41,7 @@ class CarritoViewModel : ViewModel() {
         cambiarCantidad(context, item, item.cantidad + 1)
     }
 
-    // Resta 1 unidad; el mínimo es 1 (para quitar el equipo se usa eliminar)
+    // Resta 1 unidad, con mínimo 1
     fun onMenosClick(context: Context, item: CarritoItemEntity) {
         if (item.cantidad <= 1) {
             Toast.makeText(context, "La cantidad mínima es 1", Toast.LENGTH_SHORT).show()
@@ -49,6 +50,7 @@ class CarritoViewModel : ViewModel() {
         cambiarCantidad(context, item, item.cantidad - 1)
     }
 
+    // Guarda la nueva cantidad y recarga el carrito
     private fun cambiarCantidad(context: Context, item: CarritoItemEntity, cantidad: Int) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
@@ -57,7 +59,7 @@ class CarritoViewModel : ViewModel() {
         }
     }
 
-    // Elimina el item después de confirmar en el AlertDialog
+    // Elimina el item después de confirmar
     fun onEliminarConfirmado(context: Context, item: CarritoItemEntity) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)

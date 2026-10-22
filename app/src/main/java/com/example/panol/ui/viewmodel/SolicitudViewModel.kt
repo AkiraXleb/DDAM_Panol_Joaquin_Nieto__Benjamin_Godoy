@@ -19,43 +19,51 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
 
+// ViewModel del Formulario: validación por campo y envío de la solicitud
 class SolicitudViewModel : ViewModel() {
 
     var uiState by mutableStateOf(SolicitudModel())
         private set
 
+    // Guarda la sala elegida
     fun onSalaChanged(valor: String) {
         uiState = uiState.copy(sala = valor, errorSala = "")
     }
 
+    // Guarda la fecha y revisa la regla de 3 horas
     fun onFechaChanged(context: Context, valor: Long) {
         uiState = uiState.copy(fechaMillis = valor, errorFecha = "")
         actualizarAdvertencia(context)
     }
 
+    // Guarda la hora de inicio y revisa la regla de 3 horas
     fun onHoraInicioChanged(context: Context, valor: String) {
         uiState = uiState.copy(horaInicio = valor, errorHoraInicio = "")
         actualizarAdvertencia(context)
     }
 
+    // Guarda la hora de devolución
     fun onHoraDevolucionChanged(valor: String) {
         uiState = uiState.copy(horaDevolucion = valor, errorHoraDevolucion = "")
     }
 
+    // Guarda la asignatura
     fun onAsignaturaChanged(valor: String) {
         uiState = uiState.copy(asignatura = valor)
     }
 
+    // Guarda las observaciones y valida el máximo de 200 caracteres
     fun onObservacionesChanged(valor: String) {
         val error = if (valor.length > 200) "Máximo 200 caracteres" else ""
         uiState = uiState.copy(observaciones = valor, errorObservaciones = error)
     }
 
+    // Cierra el diálogo de confirmación
     fun onCancelarConfirmacion() {
         uiState = uiState.copy(mostrarConfirmacion = false)
     }
 
-    // Convierte la fecha elegida + una hora "HH:mm" a milisegundos (hora local)
+    // Convierte la fecha elegida y una hora HH:mm a milisegundos
     private fun armarMillis(hora: String): Long {
         val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         utc.timeInMillis = uiState.fechaMillis
@@ -72,21 +80,21 @@ class SolicitudViewModel : ViewModel() {
         return cal.timeInMillis
     }
 
-    // Regla crítica: el inicio debe ser al menos 3 horas después de ahora
+    // Revisa si el inicio es antes de ahora + 3 horas
     private fun inicioMuyCercano(): Boolean {
         if (uiState.fechaMillis == 0L || uiState.horaInicio.isEmpty()) return false
         val minimo = System.currentTimeMillis() + Constantes.HORAS_ANTICIPACION * 60 * 60 * 1000L
         return armarMillis(uiState.horaInicio) < minimo
     }
 
-    // Muestra la advertencia y vibra corto cuando se rompe la regla
+    // Muestra la advertencia y vibra corto si se rompe la regla
     private fun actualizarAdvertencia(context: Context) {
         val rompeRegla = inicioMuyCercano()
         if (rompeRegla) vibrar(context, 150)
         uiState = uiState.copy(advertenciaAnticipacion = rompeRegla)
     }
 
-    // Valida cada campo; devuelve true si no hay errores
+    // Valida cada campo y devuelve true si no hay errores
     private fun validar(): Boolean {
         val state = uiState
 
@@ -127,7 +135,7 @@ class SolicitudViewModel : ViewModel() {
         return !hayErrores
     }
 
-    // Milisegundos de hoy a las 00:00 (hora local)
+    // Milisegundos de hoy a las 00:00
     private fun inicioDelDia(): Long {
         val cal = Calendar.getInstance()
         cal.set(Calendar.HOUR_OF_DAY, 0)
@@ -137,7 +145,7 @@ class SolicitudViewModel : ViewModel() {
         return cal.timeInMillis
     }
 
-    // Si todo está bien, pide confirmación antes de enviar
+    // Valida y pide confirmación antes de enviar
     fun onEnviarClick(context: Context) {
         if (inicioMuyCercano()) vibrar(context, 150)
         if (validar()) {
@@ -145,7 +153,7 @@ class SolicitudViewModel : ViewModel() {
         }
     }
 
-    // Crea la solicitud con sus detalles, vacía el carrito y avisa a la pantalla
+    // Guarda la solicitud con sus equipos, vacía el carrito y avisa a la pantalla
     fun onConfirmarEnvio(context: Context, onSuccess: () -> Unit) {
         uiState = uiState.copy(mostrarConfirmacion = false)
         viewModelScope.launch {

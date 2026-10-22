@@ -3,12 +3,12 @@ package com.example.panol.ui.model
 import java.util.Calendar
 import java.util.TimeZone
 
-// Estado del Formulario de solicitud: valores de los campos y un error por campo
+// Estado del Formulario: campos, un error por campo, advertencia de 3 horas y contador del temblor
 data class SolicitudModel(
     val sala: String = "",
-    val fechaMillis: Long = 0L,             // fecha elegida en el DatePicker (0 = sin elegir)
-    val horaInicio: String = "",            // formato HH:mm
-    val horaDevolucion: String = "",        // formato HH:mm
+    val fechaMillis: Long = 0L,
+    val horaInicio: String = "",
+    val horaDevolucion: String = "",
     val asignatura: String = "",
     val observaciones: String = "",
     val errorSala: String = "",
@@ -16,11 +16,11 @@ data class SolicitudModel(
     val errorHoraInicio: String = "",
     val errorHoraDevolucion: String = "",
     val errorObservaciones: String = "",
-    val advertenciaAnticipacion: Boolean = false,   // inicio antes de ahora + 3 horas
+    val advertenciaAnticipacion: Boolean = false,
     val mostrarConfirmacion: Boolean = false,
-    val errorTrigger: Int = 0               // sube cada vez que hay errores (dispara el temblor)
+    val errorTrigger: Int = 0
 ) {
-    // fecha elegida como texto dd/MM/yyyy (el DatePicker entrega la fecha en UTC)
+    // Fecha elegida como texto dd/MM/yyyy
     val fechaTexto: String
         get() {
             if (fechaMillis == 0L) return ""

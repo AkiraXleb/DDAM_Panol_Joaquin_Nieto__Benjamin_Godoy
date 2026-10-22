@@ -12,7 +12,7 @@ import kotlinx.coroutines.delay
 
 private const val TAG = "RecursosNativos"
 
-// Hace vibrar el teléfono por los milisegundos indicados
+// Hace vibrar el teléfono los milisegundos indicados
 fun vibrar(context: Context, milisegundos: Long) {
     val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -27,7 +27,7 @@ fun vibrar(context: Context, milisegundos: Long) {
     )
 }
 
-// Enciende o apaga la linterna; devuelve false si no hay flash o falla (ej. emulador)
+// Enciende o apaga la linterna, devuelve false si falla
 fun cambiarLinterna(context: Context, encender: Boolean): Boolean {
     return try {
         val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -49,7 +49,7 @@ fun cambiarLinterna(context: Context, encender: Boolean): Boolean {
     }
 }
 
-// Señal de una solicitud revisada: 2 veces si fue aceptada, 1 vez si fue rechazada
+// Vibra y enciende la linterna: 2 veces si fue aceptada, 1 si fue rechazada
 suspend fun senalSolicitud(context: Context, aprobada: Boolean) {
     val repeticiones = if (aprobada) 2 else 1
     Log.d(TAG, "Señal de solicitud ${if (aprobada) "aceptada" else "rechazada"} x$repeticiones")
