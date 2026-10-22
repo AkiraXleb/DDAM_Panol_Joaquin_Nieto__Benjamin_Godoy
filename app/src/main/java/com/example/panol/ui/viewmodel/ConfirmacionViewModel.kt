@@ -11,12 +11,13 @@ import com.example.panol.data.database.AppDatabase
 import com.example.panol.ui.model.ConfirmacionModel
 import kotlinx.coroutines.launch
 
+// ViewModel de la Confirmación: lee la solicitud recién creada
 class ConfirmacionViewModel : ViewModel() {
 
     var uiState by mutableStateOf(ConfirmacionModel())
         private set
 
-    // Lee la solicitud recién creada, sus equipos y el usuario de la sesión
+    // Lee la solicitud, sus equipos y el usuario de la sesión
     fun cargarSolicitud(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)

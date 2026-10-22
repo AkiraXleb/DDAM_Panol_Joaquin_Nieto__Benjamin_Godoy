@@ -45,6 +45,7 @@ import com.example.panol.ui.components.MensajeError
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.SolicitudViewModel
 
+// Pantalla del formulario de solicitud con validación por campo
 @Composable
 fun FormularioScreen(
     onVolver: () -> Unit,
@@ -54,7 +55,6 @@ fun FormularioScreen(
     val context = LocalContext.current
     val state = viewModel.uiState
 
-    // qué diálogo está abierto: "" = ninguno, "fecha", "inicio" o "devolucion"
     var dialogoAbierto by remember { mutableStateOf("") }
     var menuSalaAbierto by remember { mutableStateOf(false) }
 
@@ -88,8 +88,8 @@ fun FormularioScreen(
                 )
             }
 
-            // Tarjeta de advertencia de la regla de 3 horas
             item {
+                // Advertencia de la regla de 3 horas
                 AnimatedVisibility(visible = state.advertenciaAnticipacion) {
                     Card(
                         colors = CardDefaults.cardColors(
@@ -107,7 +107,6 @@ fun FormularioScreen(
                 }
             }
 
-            // Sala (menú desplegable)
             item {
                 Box {
                     CampoSelector(
@@ -193,6 +192,7 @@ fun FormularioScreen(
         }
     }
 
+    // Diálogos de fecha y horas
     if (dialogoAbierto == "fecha") {
         DialogoFecha(
             fechaInicial = state.fechaMillis,
@@ -226,7 +226,7 @@ fun FormularioScreen(
         )
     }
 
-    // Confirmación antes de enviar
+    // Diálogo para confirmar el envío
     if (state.mostrarConfirmacion) {
         AlertDialog(
             onDismissRequest = { viewModel.onCancelarConfirmacion() },
@@ -267,7 +267,6 @@ private fun CampoSelector(
             supportingText = { MensajeError(error) },
             modifier = Modifier.fillMaxWidth()
         )
-        // capa transparente que recibe el toque (el TextField de solo lectura no lo deja pasar)
         Box(
             modifier = Modifier
                 .matchParentSize()
@@ -276,6 +275,7 @@ private fun CampoSelector(
     }
 }
 
+// Diálogo con calendario para elegir la fecha
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DialogoFecha(
@@ -304,6 +304,7 @@ private fun DialogoFecha(
     }
 }
 
+// Diálogo con reloj para elegir una hora
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DialogoHora(
@@ -312,7 +313,6 @@ private fun DialogoHora(
     onConfirmar: (String) -> Unit,
     onCancelar: () -> Unit
 ) {
-    // si ya había una hora elegida, el reloj parte desde ella
     val partes = horaInicial.split(":")
     val pickerState = rememberTimePickerState(
         initialHour = partes.getOrNull(0)?.toIntOrNull() ?: 8,

@@ -35,6 +35,7 @@ import com.example.panol.ui.navigation.Routes
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.ConfirmacionViewModel
 
+// Pantalla de confirmación con el resumen de la solicitud enviada
 @Composable
 fun ConfirmacionScreen(
     onNavegar: (String) -> Unit,
@@ -49,7 +50,7 @@ fun ConfirmacionScreen(
         viewModel.cargarSolicitud(context)
     }
 
-    // Pulso del check: crece y vuelve a su tamaño 3 veces
+    // Pulso del check
     val escala = remember { Animatable(1f) }
     LaunchedEffect(Unit) {
         repeat(3) {
@@ -169,6 +170,7 @@ fun ConfirmacionScreen(
     }
 }
 
+// Fila con título y valor
 @Composable
 private fun DatoConfirmacion(titulo: String, valor: String) {
     Row(modifier = Modifier

@@ -40,6 +40,7 @@ import com.example.panol.ui.navigation.Routes
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.CarritoViewModel
 
+// Pantalla del carrito con resumen y acceso al formulario
 @Composable
 fun CarritoScreen(
     onContinuar: () -> Unit,
@@ -48,7 +49,6 @@ fun CarritoScreen(
 ) {
     val context = LocalContext.current
     val state = viewModel.uiState
-    // item que el usuario quiere eliminar (null = diálogo cerrado)
     var itemAEliminar by remember { mutableStateOf<CarritoItemEntity?>(null) }
 
     LaunchedEffect(Unit) {
@@ -132,8 +132,8 @@ fun CarritoScreen(
         }
     }
 
-    // Confirmación antes de eliminar
     val item = itemAEliminar
+    // Diálogo para confirmar la eliminación
     if (item != null) {
         AlertDialog(
             onDismissRequest = { itemAEliminar = null },
@@ -156,6 +156,7 @@ fun CarritoScreen(
     }
 }
 
+// Tarjeta de un equipo del carrito con cantidad y eliminar
 @Composable
 private fun TarjetaCarrito(
     item: CarritoItemEntity,
