@@ -13,12 +13,13 @@ import com.example.panol.data.local.entity.SolicitudEntity
 import com.example.panol.ui.model.MisSolicitudesModel
 import kotlinx.coroutines.launch
 
+// ViewModel de Mis Solicitudes: filtro, cancelación y avisos
 class MisSolicitudesViewModel : ViewModel() {
 
     var uiState by mutableStateOf(MisSolicitudesModel())
         private set
 
-    // Lee las solicitudes del usuario, sus equipos y el contador del carrito
+    // Lee las solicitudes, sus equipos y el contador del carrito
     fun cargarSolicitudes(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
@@ -32,7 +33,7 @@ class MisSolicitudesViewModel : ViewModel() {
         }
     }
 
-    // Busca las solicitudes aceptadas/rechazadas sin avisar, las marca como notificadas y las devuelve
+    // Busca las solicitudes sin avisar, las marca como notificadas y las devuelve
     suspend fun obtenerYMarcarNotificadas(context: Context): List<SolicitudEntity> {
         val db = AppDatabase.getDatabase(context)
         val usuarioId = Sesion.usuario?.id ?: return emptyList()
@@ -41,17 +42,18 @@ class MisSolicitudesViewModel : ViewModel() {
         return nuevas
     }
 
+    // Quita el filtro de estado
     fun onTodasClick() {
         uiState = uiState.copy(estadoSeleccionado = "")
     }
 
-    // Si se toca el estado ya seleccionado, se quita el filtro
+    // Filtra por estado, o quita el filtro si ya estaba elegido
     fun onEstadoClick(estado: String) {
         val nuevo = if (uiState.estadoSeleccionado == estado) "" else estado
         uiState = uiState.copy(estadoSeleccionado = nuevo)
     }
 
-    // Cancela una solicitud pendiente después de confirmar en el AlertDialog
+    // Cambia una solicitud pendiente a Cancelada
     fun onCancelarConfirmado(context: Context, solicitud: SolicitudEntity) {
         if (solicitud.estado != EstadoSolicitud.PENDIENTE) return
         viewModelScope.launch {
