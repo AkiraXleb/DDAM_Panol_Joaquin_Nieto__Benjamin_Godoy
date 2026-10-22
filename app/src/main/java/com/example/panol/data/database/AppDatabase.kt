@@ -14,6 +14,7 @@ import com.example.panol.data.local.entity.EquipoEntity
 import com.example.panol.data.local.entity.SolicitudEntity
 import com.example.panol.data.local.entity.UsuarioEntity
 
+// Base de datos Room con las tablas de usuarios, equipos, carrito y solicitudes
 @Database(
     entities = [
         UsuarioEntity::class,
@@ -27,21 +28,27 @@ import com.example.panol.data.local.entity.UsuarioEntity
 )
 abstract class AppDatabase : RoomDatabase() {
 
+    // DAO de usuarios
     abstract fun usuarioDao(): UsuarioDao
+    // DAO de equipos
     abstract fun equipoDao(): EquipoDao
+    // DAO del carrito
     abstract fun carritoDao(): CarritoDao
+    // DAO de solicitudes
     abstract fun solicitudDao(): SolicitudDao
 
-    companion object {          // patrón singleton: una sola instancia de la BD
+    // Singleton: una sola instancia de la base de datos
+    companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        // Devuelve la base de datos y la crea la primera vez
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "panol_database.db" // nombre del archivo SQLite
+                    "panol_database.db"
                 ).build()
                 INSTANCE = instance
                 instance

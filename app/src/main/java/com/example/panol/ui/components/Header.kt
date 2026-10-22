@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.panol.R
 import com.example.panol.ui.theme.TealClaro
 
-// Encabezado de todas las pantallas; si se pasa onVolver muestra la flecha hacia atrás
+// Encabezado de las pantallas, con flecha para volver si se entrega onVolver
 @Composable
 fun Header(onVolver: (() -> Unit)? = null) {
     Box(

@@ -2,7 +2,6 @@ package com.example.panol.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Paleta del mockup (DESIGN.md): teal institucional + naranjo para acciones
 
 // Teal (primario)
 val Teal = Color(0xFF006973)

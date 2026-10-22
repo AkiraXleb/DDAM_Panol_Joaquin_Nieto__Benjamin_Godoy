@@ -11,12 +11,13 @@ import com.example.panol.data.database.AppDatabase
 import com.example.panol.ui.model.PerfilModel
 import kotlinx.coroutines.launch
 
+// ViewModel del Perfil: datos del usuario y cierre de sesión
 class PerfilViewModel : ViewModel() {
 
     var uiState by mutableStateOf(PerfilModel())
         private set
 
-    // Lee los datos del usuario conectado y el contador del carrito
+    // Lee los datos del usuario y el contador del carrito
     fun cargarDatos(context: Context) {
         val usuario = Sesion.usuario ?: return
         uiState = PerfilModel(
@@ -31,7 +32,7 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Borra el usuario de la sesión y avisa a la pantalla para ir al Login
+    // Borra la sesión y avisa a la pantalla
     fun onCerrarSesionConfirmado(onSuccess: () -> Unit) {
         Sesion.cerrarSesion()
         onSuccess()

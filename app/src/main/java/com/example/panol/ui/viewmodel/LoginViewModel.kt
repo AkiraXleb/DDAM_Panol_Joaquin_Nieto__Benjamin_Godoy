@@ -13,15 +13,18 @@ import com.example.panol.data.database.AppDatabase
 import com.example.panol.ui.model.LoginModel
 import kotlinx.coroutines.launch
 
+// ViewModel del Login: validación de campos y credenciales
 class LoginViewModel : ViewModel() {
 
     var uiState by mutableStateOf(LoginModel())
         private set
 
+    // Actualiza el correo y limpia sus errores
     fun onCorreoChanged(valor: String) {
         uiState = uiState.copy(correo = valor, errorCorreo = "", errorGeneral = "")
     }
 
+    // Actualiza la contraseña y limpia sus errores
     fun onPasswordChanged(valor: String) {
         uiState = uiState.copy(password = valor, errorPassword = "", errorGeneral = "")
     }
@@ -34,7 +37,7 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Valida los campos; devuelve true si no hay errores
+    // Valida cada campo y devuelve true si no hay errores
     private fun validar(): Boolean {
         val correo = uiState.correo.trim()
         val password = uiState.password
@@ -60,6 +63,7 @@ class LoginViewModel : ViewModel() {
         return !hayErrores
     }
 
+    // Valida, busca el usuario en Room y guarda la sesión
     fun onLoginClick(context: Context, onSuccess: () -> Unit) {
         if (!validar()) return
 

@@ -6,17 +6,17 @@ import com.example.panol.data.local.entity.EquipoEntity
 import com.example.panol.data.local.entity.SolicitudEntity
 import com.example.panol.data.local.entity.UsuarioEntity
 
-// Datos ficticios para probar la app (el caso prohíbe usar datos reales - Ley 19.628 / 21.719)
-// Se cargan solo la primera vez, cuando la base de datos está vacía
+// Datos ficticios de prueba, se cargan solo si la base de datos está vacía
 object DatosIniciales {
 
     private const val HORA = 60 * 60 * 1000L
     private const val DIA = 24 * HORA
 
+    // Inserta usuarios, equipos y solicitudes de ejemplo la primera vez
     suspend fun cargar(db: AppDatabase) {
-        if (db.usuarioDao().contarUsuarios() > 0) return   // ya hay datos, no se cargan de nuevo
+        if (db.usuarioDao().contarUsuarios() > 0) return
 
-        // ---------- USUARIOS ----------
+        // Usuarios
         db.usuarioDao().insertarUsuario(
             UsuarioEntity(
                 nombre = "Patricia González",
@@ -45,7 +45,7 @@ object DatosIniciales {
             )
         )
 
-        // ---------- EQUIPOS ----------
+        // Equipos
         db.equipoDao().insertarEquipos(
             listOf(
                 EquipoEntity(
@@ -128,9 +128,7 @@ object DatosIniciales {
             )
         )
 
-        // ---------- SOLICITUDES DE EJEMPLO (de la profesora Patricia) ----------
-        // Como la consola del encargado TI se hace en la siguiente etapa, se precargan
-        // solicitudes en distintos estados para poder mostrar "Mis Solicitudes"
+        // Solicitudes de ejemplo de la profesora Patricia
         val patricia = db.usuarioDao().obtenerPorEmail("profesora.patricia@escuelamarcelapaz.cl") ?: return
         val ahora = System.currentTimeMillis()
 
@@ -192,8 +190,7 @@ object DatosIniciales {
         )
     }
 
-    // inserta la solicitud y luego sus equipos con el id generado
-    // (se usa copy() del data class para asignar el solicitudId a cada detalle)
+    // Inserta una solicitud y luego sus equipos con el id generado
     private suspend fun crearSolicitud(
         db: AppDatabase,
         solicitud: SolicitudEntity,

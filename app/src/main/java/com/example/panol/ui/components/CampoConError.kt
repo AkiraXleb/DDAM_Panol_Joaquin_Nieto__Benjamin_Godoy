@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.panol.R
 
-// Mensaje de error con ícono; aparece con animación solo si hay texto
+// Mensaje de error con ícono que aparece con animación
 @Composable
 fun MensajeError(mensaje: String, modifier: Modifier = Modifier) {
     AnimatedVisibility(visible = mensaje.isNotEmpty(), modifier = modifier) {

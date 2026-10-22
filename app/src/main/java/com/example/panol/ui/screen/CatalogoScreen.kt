@@ -44,6 +44,7 @@ import com.example.panol.ui.navigation.Routes
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.CatalogoViewModel
 
+// Pantalla del catálogo con buscador, filtros y lista de equipos
 @Composable
 fun CatalogoScreen(
     onVerDetalle: () -> Unit,
@@ -135,6 +136,7 @@ fun CatalogoScreen(
     }
 }
 
+// Tarjeta de un equipo con estado, stock y botones
 @Composable
 private fun TarjetaEquipo(
     equipo: EquipoEntity,

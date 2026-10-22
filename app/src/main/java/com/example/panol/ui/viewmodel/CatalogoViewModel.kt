@@ -15,6 +15,7 @@ import com.example.panol.data.local.entity.EquipoEntity
 import com.example.panol.ui.model.CatalogoModel
 import kotlinx.coroutines.launch
 
+// ViewModel del Catálogo: búsqueda, filtros y agregar al carrito
 class CatalogoViewModel : ViewModel() {
 
     var uiState by mutableStateOf(CatalogoModel())
@@ -32,21 +33,23 @@ class CatalogoViewModel : ViewModel() {
         }
     }
 
+    // Actualiza el texto del buscador
     fun onBusquedaChanged(valor: String) {
         uiState = uiState.copy(busqueda = valor)
     }
 
+    // Quita el filtro de categoría
     fun onTodosClick() {
         uiState = uiState.copy(categoriaSeleccionada = "")
     }
 
-    // Si se toca la categoría ya seleccionada, se quita el filtro
+    // Filtra por categoría, o quita el filtro si ya estaba elegida
     fun onCategoriaClick(categoria: String) {
         val nueva = if (uiState.categoriaSeleccionada == categoria) "" else categoria
         uiState = uiState.copy(categoriaSeleccionada = nueva)
     }
 
-    // Agrega 1 unidad al carrito (o suma 1 si ya existe), respetando el máximo
+    // Agrega 1 unidad al carrito respetando el máximo
     fun onAgregarClick(context: Context, equipo: EquipoEntity) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
