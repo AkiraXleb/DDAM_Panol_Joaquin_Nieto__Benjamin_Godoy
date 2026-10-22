@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.panol.R
 import com.example.panol.ui.navigation.Routes
 
-// Barra inferior reutilizable: Catálogo, Carrito, Mis Solicitudes y Perfil
+// Barra inferior con Catálogo, Carrito, Solicitudes y Perfil
 @Composable
 fun BarraInferior(
     rutaActual: String,
@@ -51,6 +51,7 @@ fun BarraInferior(
     }
 }
 
+// Un botón de la barra inferior con ícono y texto
 @Composable
 private fun ItemBarra(texto: String, icono: Int, seleccionado: Boolean, onClick: () -> Unit) {
     val color = if (seleccionado) MaterialTheme.colorScheme.primary

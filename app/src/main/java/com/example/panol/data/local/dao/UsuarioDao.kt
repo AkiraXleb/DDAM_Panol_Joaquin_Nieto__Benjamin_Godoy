@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.panol.data.local.entity.UsuarioEntity
 
+// Consultas de la tabla usuarios
 @Dao
 interface UsuarioDao {
 

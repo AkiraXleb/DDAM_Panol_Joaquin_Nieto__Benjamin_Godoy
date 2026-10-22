@@ -29,6 +29,7 @@ import com.example.panol.ui.components.Header
 import com.example.panol.ui.navigation.Routes
 import com.example.panol.ui.viewmodel.PerfilViewModel
 
+// Pantalla del perfil con los datos del usuario y cierre de sesión
 @Composable
 fun PerfilScreen(
     onNavegar: (String) -> Unit,
@@ -84,6 +85,7 @@ fun PerfilScreen(
         }
     }
 
+    // Diálogo para confirmar el cierre de sesión
     if (mostrarDialogo) {
         AlertDialog(
             onDismissRequest = { mostrarDialogo = false },
@@ -106,6 +108,7 @@ fun PerfilScreen(
     }
 }
 
+// Fila con título y valor
 @Composable
 private fun DatoPerfil(titulo: String, valor: String) {
     Row(modifier = Modifier

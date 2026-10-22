@@ -33,14 +33,14 @@ fun ChipEstado(estado: String) {
     Pildora(estado, fondo, texto)
 }
 
-// Chip de color según el estado de la solicitud (Confirmación y Mis Solicitudes)
+// Chip de color según el estado de la solicitud
 @Composable
 fun ChipEstadoSolicitud(estado: String) {
     val (fondo, texto) = when (estado) {
         EstadoSolicitud.PENDIENTE -> ReservadoFondo to ReservadoTexto
         EstadoSolicitud.ACEPTADA, EstadoSolicitud.DEVUELTA -> DisponibleFondo to DisponibleTexto
         EstadoSolicitud.ENTREGADA -> PrestadoFondo to PrestadoTexto
-        else -> MantenimientoFondo to MantenimientoTexto   // Rechazada, Cancelada
+        else -> MantenimientoFondo to MantenimientoTexto
     }
     Pildora(estado, fondo, texto)
 }
@@ -58,7 +58,7 @@ private fun Pildora(texto: String, fondo: Color, colorTexto: Color) {
     }
 }
 
-// Ícono vectorial según la categoría del equipo
+// Devuelve el ícono de la categoría del equipo
 fun iconoCategoria(categoria: String): Int {
     return when (categoria) {
         "Notebook" -> R.drawable.ic_cat_notebook

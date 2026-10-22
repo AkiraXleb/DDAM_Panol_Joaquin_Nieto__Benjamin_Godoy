@@ -7,6 +7,7 @@ import androidx.room.Query
 import com.example.panol.data.local.entity.DetalleSolicitudEntity
 import com.example.panol.data.local.entity.SolicitudEntity
 
+// Consultas de las tablas solicitudes y detalle_solicitud
 @Dao
 interface SolicitudDao {
 
