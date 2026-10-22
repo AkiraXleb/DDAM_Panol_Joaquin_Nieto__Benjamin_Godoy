@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.panol.ui.screen.CatalogoScreen
+import com.example.panol.ui.screen.DetalleScreen
 import com.example.panol.ui.screen.LoginScreen
 
 object Routes {
@@ -43,7 +44,12 @@ fun AppNavigation() {
                 }
             )
         }
-        composable(Routes.DETALLE) { Pendiente("Detalle") }
+        composable(Routes.DETALLE) {
+            DetalleScreen(
+                onVolver = { navController.popBackStack() },
+                onAgregado = { navController.popBackStack() }
+            )
+        }
         composable(Routes.CARRITO) { Pendiente("Carrito") }
         composable(Routes.MIS_SOLICITUDES) { Pendiente("Mis Solicitudes") }
         composable(Routes.PERFIL) { Pendiente("Perfil") }
