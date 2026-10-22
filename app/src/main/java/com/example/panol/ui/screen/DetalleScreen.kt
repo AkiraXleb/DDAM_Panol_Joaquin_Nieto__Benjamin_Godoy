@@ -34,6 +34,7 @@ import com.example.panol.ui.components.iconoCategoria
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.DetalleViewModel
 
+// Pantalla de detalle de un equipo con selector de cantidad
 @Composable
 fun DetalleScreen(
     onVolver: () -> Unit,
@@ -143,6 +144,7 @@ fun DetalleScreen(
     }
 }
 
+// Fila con título y valor
 @Composable
 private fun DatoFila(titulo: String, valor: String) {
     Row(modifier = Modifier

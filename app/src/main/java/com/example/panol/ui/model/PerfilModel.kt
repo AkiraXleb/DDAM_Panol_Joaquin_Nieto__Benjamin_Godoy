@@ -1,6 +1,6 @@
 package com.example.panol.ui.model
 
-// Estado de la pantalla Perfil
+// Estado de la pantalla Perfil: datos del usuario y contador del carrito
 data class PerfilModel(
     val nombre: String = "",
     val cargo: String = "",

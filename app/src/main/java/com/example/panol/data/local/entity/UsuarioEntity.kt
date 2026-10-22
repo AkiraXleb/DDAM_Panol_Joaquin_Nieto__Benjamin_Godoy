@@ -3,7 +3,7 @@ package com.example.panol.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// Tabla de usuarios: solicitantes (docentes, inspectoría, UTP, dirección) y encargado TI
+// Tabla de usuarios: nombre, correo, contraseña, cargo y departamento
 @Entity(tableName = "usuarios")
 data class UsuarioEntity(
     @PrimaryKey(autoGenerate = true)
@@ -11,6 +11,6 @@ data class UsuarioEntity(
     val nombre: String,
     val email: String,
     val password: String,
-    val cargo: String,          // Docente, Inspector, UTP, Directivo, Encargado TI
+    val cargo: String,
     val departamento: String
 )

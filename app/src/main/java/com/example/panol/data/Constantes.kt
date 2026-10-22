@@ -1,7 +1,7 @@
 package com.example.panol.data
 
-// Valores fijos del caso MPAZ Pañol (se usan en filtros, formularios y validaciones)
 
+// Estados posibles de un equipo del inventario
 object EstadoEquipo {
     const val DISPONIBLE = "Disponible"
     const val RESERVADO = "Reservado"
@@ -10,6 +10,7 @@ object EstadoEquipo {
     const val FUERA_SERVICIO = "Fuera de Servicio"
 }
 
+// Estados posibles de una solicitud de préstamo
 object EstadoSolicitud {
     const val PENDIENTE = "Pendiente"
     const val ACEPTADA = "Aceptada"
@@ -19,6 +20,7 @@ object EstadoSolicitud {
     const val CANCELADA = "Cancelada"
 }
 
+// Valores fijos del caso: categorías, salas, dominio de correo y reglas del préstamo
 object Constantes {
     val CATEGORIAS = listOf(
         "Notebook", "Computador", "Proyector", "Parlante",

@@ -57,12 +57,12 @@ private val LightColorScheme = lightColorScheme(
     onErrorContainer = ErrorSobreContenedor
 )
 
+// Tema de la app con la paleta del mockup, sin dynamic color
 @Composable
 fun PanolTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // Sin dynamic color: siempre se usa la paleta del mockup
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
@@ -72,7 +72,7 @@ fun PanolTheme(
     )
 }
 
-// Colores de los botones de acción (naranjo): agregar al carrito, enviar solicitud, etc.
+// Colores naranjos de los botones de acción
 @Composable
 fun coloresBotonAccion(): ButtonColors {
     return ButtonDefaults.buttonColors(

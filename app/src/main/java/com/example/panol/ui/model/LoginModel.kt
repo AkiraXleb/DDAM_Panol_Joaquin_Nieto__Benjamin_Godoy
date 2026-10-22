@@ -1,11 +1,11 @@
 package com.example.panol.ui.model
 
-// Estado de la pantalla de Login: valores de los campos y un error por campo
+// Estado del Login: campos, un error por campo y contador que dispara el temblor
 data class LoginModel(
     val correo: String = "",
     val password: String = "",
     val errorCorreo: String = "",
     val errorPassword: String = "",
     val errorGeneral: String = "",
-    val errorTrigger: Int = 0   // sube cada vez que hay errores (dispara el temblor)
+    val errorTrigger: Int = 0
 )

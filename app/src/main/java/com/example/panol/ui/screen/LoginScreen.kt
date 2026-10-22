@@ -30,6 +30,7 @@ import com.example.panol.ui.components.MensajeError
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.LoginViewModel
 
+// Pantalla de inicio de sesión con validación por campo
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
@@ -38,7 +39,6 @@ fun LoginScreen(
     val context = LocalContext.current
     val state = viewModel.uiState
 
-    // Carga los datos ficticios una sola vez al abrir el Login
     LaunchedEffect(Unit) {
         viewModel.cargarDatosIniciales(context)
     }

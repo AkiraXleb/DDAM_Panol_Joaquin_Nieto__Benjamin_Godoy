@@ -18,6 +18,7 @@ import com.example.panol.ui.screen.LoginScreen
 import com.example.panol.ui.screen.MisSolicitudesScreen
 import com.example.panol.ui.screen.PerfilScreen
 
+// Nombres de las rutas de navegación
 object Routes {
     const val LOGIN = "login"
     const val CATALOGO = "catalogo"
@@ -29,11 +30,12 @@ object Routes {
     const val PERFIL = "perfil"
 }
 
+// Define las rutas de la app y cómo se navega entre pantallas
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    // Navegación de la barra inferior: volver al Catálogo no lo duplica en la pila
+    // Navegación de la barra inferior, sin duplicar el Catálogo en la pila
     val navegar: (String) -> Unit = { ruta ->
         navController.navigate(ruta) {
             popUpTo(Routes.CATALOGO) { inclusive = ruta == Routes.CATALOGO }
@@ -70,7 +72,6 @@ fun AppNavigation() {
             FormularioScreen(
                 onVolver = { navController.popBackStack() },
                 onEnviado = {
-                    // saca Carrito y Formulario de la pila para no volver a ellos
                     navController.navigate(Routes.CONFIRMACION) {
                         popUpTo(Routes.CARRITO) { inclusive = true }
                     }
@@ -92,7 +93,7 @@ fun AppNavigation() {
     }
 }
 
-// Pantalla provisoria hasta implementar cada módulo
+// Pantalla provisoria para rutas sin implementar
 @Composable
 private fun Pendiente(nombre: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
