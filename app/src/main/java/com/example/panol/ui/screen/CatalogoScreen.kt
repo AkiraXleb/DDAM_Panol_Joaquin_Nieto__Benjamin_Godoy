@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
@@ -22,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,15 +36,9 @@ import com.example.panol.data.EstadoEquipo
 import com.example.panol.data.Sesion
 import com.example.panol.data.local.entity.EquipoEntity
 import com.example.panol.ui.components.BarraInferior
+import com.example.panol.ui.components.ChipEstado
+import com.example.panol.ui.components.iconoCategoria
 import com.example.panol.ui.navigation.Routes
-import com.example.panol.ui.theme.DisponibleFondo
-import com.example.panol.ui.theme.DisponibleTexto
-import com.example.panol.ui.theme.MantenimientoFondo
-import com.example.panol.ui.theme.MantenimientoTexto
-import com.example.panol.ui.theme.PrestadoFondo
-import com.example.panol.ui.theme.PrestadoTexto
-import com.example.panol.ui.theme.ReservadoFondo
-import com.example.panol.ui.theme.ReservadoTexto
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.CatalogoViewModel
 
@@ -198,36 +190,5 @@ private fun TarjetaEquipo(
                 }
             }
         }
-    }
-}
-
-// Chip de color según el estado del equipo
-@Composable
-private fun ChipEstado(estado: String) {
-    val (fondo, texto) = when (estado) {
-        EstadoEquipo.DISPONIBLE -> DisponibleFondo to DisponibleTexto
-        EstadoEquipo.RESERVADO -> ReservadoFondo to ReservadoTexto
-        EstadoEquipo.PRESTADO -> PrestadoFondo to PrestadoTexto
-        else -> MantenimientoFondo to MantenimientoTexto
-    }
-    Surface(color = fondo, shape = RoundedCornerShape(50)) {
-        Text(
-            text = estado,
-            color = texto,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-        )
-    }
-}
-
-private fun iconoCategoria(categoria: String): Int {
-    return when (categoria) {
-        "Notebook" -> R.drawable.ic_cat_notebook
-        "Computador" -> R.drawable.ic_cat_computador
-        "Proyector" -> R.drawable.ic_cat_proyector
-        "Parlante" -> R.drawable.ic_cat_parlante
-        "Alargador" -> R.drawable.ic_cat_alargador
-        "Robótica" -> R.drawable.ic_cat_robotica
-        else -> R.drawable.ic_cat_red
     }
 }
