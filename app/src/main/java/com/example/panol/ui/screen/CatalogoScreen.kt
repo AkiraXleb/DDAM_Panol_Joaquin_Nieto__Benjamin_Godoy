@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -37,6 +38,7 @@ import com.example.panol.data.Sesion
 import com.example.panol.data.local.entity.EquipoEntity
 import com.example.panol.ui.components.BarraInferior
 import com.example.panol.ui.components.ChipEstado
+import com.example.panol.ui.components.Header
 import com.example.panol.ui.components.iconoCategoria
 import com.example.panol.ui.navigation.Routes
 import com.example.panol.ui.theme.coloresBotonAccion
@@ -57,6 +59,7 @@ fun CatalogoScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = { Header() },
         bottomBar = {
             BarraInferior(
                 rutaActual = Routes.CATALOGO,
@@ -71,12 +74,6 @@ fun CatalogoScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = "Catálogo de equipos",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-
             OutlinedTextField(
                 value = state.busqueda,
                 onValueChange = { viewModel.onBusquedaChanged(it) },
@@ -84,7 +81,12 @@ fun CatalogoScreen(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp)
+                    .padding(top = 16.dp)
+            )
+
+            val coloresChip = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
             )
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -92,14 +94,16 @@ fun CatalogoScreen(
                     FilterChip(
                         selected = state.categoriaSeleccionada.isEmpty(),
                         onClick = { viewModel.onTodosClick() },
-                        label = { Text("Todos") }
+                        label = { Text("Todos") },
+                        colors = coloresChip
                     )
                 }
                 items(Constantes.CATEGORIAS) { categoria ->
                     FilterChip(
                         selected = state.categoriaSeleccionada == categoria,
                         onClick = { viewModel.onCategoriaClick(categoria) },
-                        label = { Text(categoria) }
+                        label = { Text(categoria) },
+                        colors = coloresChip
                     )
                 }
             }

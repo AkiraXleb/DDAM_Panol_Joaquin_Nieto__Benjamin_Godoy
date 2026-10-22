@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.panol.data.EstadoEquipo
 import com.example.panol.ui.components.ChipEstado
+import com.example.panol.ui.components.Header
 import com.example.panol.ui.components.MensajeError
 import com.example.panol.ui.components.iconoCategoria
 import com.example.panol.ui.theme.coloresBotonAccion
@@ -47,7 +48,10 @@ fun DetalleScreen(
         viewModel.cargarEquipo(context)
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = { Header(onVolver = onVolver) }
+    ) { innerPadding ->
         if (equipo == null) {
             Text("Cargando equipo...", modifier = Modifier.padding(innerPadding).padding(16.dp))
             return@Scaffold
@@ -62,15 +66,9 @@ fun DetalleScreen(
                 .padding(horizontal = 16.dp)
         ) {
             item {
-                OutlinedButton(onClick = onVolver, modifier = Modifier.padding(top = 16.dp)) {
-                    Text("Volver")
-                }
-            }
-
-            item {
                 Card(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp)) {
+                    .padding(top = 16.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
