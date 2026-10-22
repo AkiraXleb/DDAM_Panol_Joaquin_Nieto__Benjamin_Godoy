@@ -62,6 +62,7 @@ private val ESTADOS = listOf(
     EstadoSolicitud.CANCELADA
 )
 
+// Pantalla con las solicitudes del usuario, filtros y avisos nativos
 @Composable
 fun MisSolicitudesScreen(
     onNavegar: (String) -> Unit,
@@ -69,16 +70,14 @@ fun MisSolicitudesScreen(
 ) {
     val context = LocalContext.current
     val state = viewModel.uiState
-    // solicitud que el usuario quiere cancelar (null = diálogo cerrado)
     var solicitudACancelar by remember { mutableStateOf<SolicitudEntity?>(null) }
 
-    // ids de las solicitudes recién revisadas (sus tarjetas tiemblan)
     var idsTemblando by remember { mutableStateOf(listOf<Int>()) }
 
     LaunchedEffect(Unit) {
         viewModel.cargarSolicitudes(context)
 
-        // Señal nativa por cada solicitud aceptada o rechazada que aún no se avisó
+        // Aviso con vibración y linterna por cada solicitud revisada
         val nuevas = viewModel.obtenerYMarcarNotificadas(context)
         idsTemblando = nuevas.map { it.id }
         nuevas.forEach { solicitud ->
@@ -87,7 +86,6 @@ fun MisSolicitudesScreen(
             Toast.makeText(context, "Tu solicitud SOL-${solicitud.id} fue $texto", Toast.LENGTH_SHORT).show()
             senalSolicitud(context, aprobada)
         }
-        // la tarjeta sigue temblando unos segundos más
         if (nuevas.isNotEmpty()) {
             delay(2000)
             idsTemblando = emptyList()
@@ -166,8 +164,8 @@ fun MisSolicitudesScreen(
         }
     }
 
-    // Confirmación antes de cancelar
     val pendiente = solicitudACancelar
+    // Diálogo para confirmar la cancelación
     if (pendiente != null) {
         AlertDialog(
             onDismissRequest = { solicitudACancelar = null },
@@ -190,6 +188,7 @@ fun MisSolicitudesScreen(
     }
 }
 
+// Tarjeta de una solicitud, tiembla si fue revisada recién
 @Composable
 private fun TarjetaSolicitud(
     solicitud: SolicitudEntity,
@@ -197,7 +196,7 @@ private fun TarjetaSolicitud(
     temblando: Boolean,
     onCancelar: () -> Unit
 ) {
-    // Temblor horizontal de la tarjeta (como TarjetaVibracion de la Práctica 5)
+    // Temblor de la tarjeta
     val transicion = rememberInfiniteTransition(label = "temblor")
     val desplazamiento by transicion.animateFloat(
         initialValue = -6f,
