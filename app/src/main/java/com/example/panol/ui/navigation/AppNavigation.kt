@@ -9,9 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.panol.ui.screen.CarritoScreen
 import com.example.panol.ui.screen.CatalogoScreen
+import com.example.panol.ui.screen.ConfirmacionScreen
 import com.example.panol.ui.screen.DetalleScreen
+import com.example.panol.ui.screen.FormularioScreen
 import com.example.panol.ui.screen.LoginScreen
+import com.example.panol.ui.screen.MisSolicitudesScreen
 import com.example.panol.ui.screen.PerfilScreen
 
 object Routes {
@@ -20,6 +24,8 @@ object Routes {
     const val DETALLE = "detalle"
     const val CARRITO = "carrito"
     const val MIS_SOLICITUDES = "mis_solicitudes"
+    const val FORMULARIO = "formulario"
+    const val CONFIRMACION = "confirmacion"
     const val PERFIL = "perfil"
 }
 
@@ -54,8 +60,25 @@ fun AppNavigation() {
                 onAgregado = { navController.popBackStack() }
             )
         }
-        composable(Routes.CARRITO) { Pendiente("Carrito") }
-        composable(Routes.MIS_SOLICITUDES) { Pendiente("Mis Solicitudes") }
+        composable(Routes.CARRITO) {
+            CarritoScreen(
+                onContinuar = { navController.navigate(Routes.FORMULARIO) },
+                onNavegar = navegar
+            )
+        }
+        composable(Routes.FORMULARIO) {
+            FormularioScreen(
+                onVolver = { navController.popBackStack() },
+                onEnviado = {
+                    // saca Carrito y Formulario de la pila para no volver a ellos
+                    navController.navigate(Routes.CONFIRMACION) {
+                        popUpTo(Routes.CARRITO) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Routes.CONFIRMACION) { ConfirmacionScreen(onNavegar = navegar) }
+        composable(Routes.MIS_SOLICITUDES) { MisSolicitudesScreen(onNavegar = navegar) }
         composable(Routes.PERFIL) {
             PerfilScreen(
                 onNavegar = navegar,
