@@ -12,6 +12,7 @@ import com.example.panol.data.Sesion
 import com.example.panol.data.database.AppDatabase
 import com.example.panol.data.local.entity.CarritoItemEntity
 import com.example.panol.data.local.entity.EquipoEntity
+import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.CatalogoModel
 import kotlinx.coroutines.launch
 
@@ -21,15 +22,19 @@ class CatalogoViewModel : ViewModel() {
     var uiState by mutableStateOf(CatalogoModel())
         private set
 
-    // Lee los equipos y el contador del carrito desde Room
+    // Lee los equipos desde el microservicio y el contador del carrito desde Room
     fun cargarDatos(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
             val usuarioId = Sesion.usuario?.id ?: 0
-            uiState = uiState.copy(
-                equipos = db.equipoDao().obtenerTodos(),
-                unidadesCarrito = db.carritoDao().contarUnidades(usuarioId)
-            )
+            val unidades = db.carritoDao().contarUnidades(usuarioId)
+            try {
+                val equipos = PanolRepository.equipos()
+                uiState = uiState.copy(equipos = equipos, unidadesCarrito = unidades)
+            } catch (e: Exception) {
+                uiState = uiState.copy(unidadesCarrito = unidades)
+                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            }
         }
     }
 
