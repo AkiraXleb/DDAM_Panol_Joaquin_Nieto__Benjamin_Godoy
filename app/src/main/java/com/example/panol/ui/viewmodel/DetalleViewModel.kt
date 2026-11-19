@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.panol.data.Sesion
 import com.example.panol.data.database.AppDatabase
 import com.example.panol.data.local.entity.CarritoItemEntity
+import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.DetalleModel
 import kotlinx.coroutines.launch
 
@@ -19,11 +20,14 @@ class DetalleViewModel : ViewModel() {
     var uiState by mutableStateOf(DetalleModel())
         private set
 
-    // Lee el equipo elegido en el Catálogo
+    // Lee el equipo elegido en el Catálogo desde el microservicio
     fun cargarEquipo(context: Context) {
         viewModelScope.launch {
-            val db = AppDatabase.getDatabase(context)
-            uiState = DetalleModel(equipo = db.equipoDao().obtenerPorId(Sesion.equipoSeleccionadoId))
+            try {
+                uiState = DetalleModel(equipo = PanolRepository.equipo(Sesion.equipoSeleccionadoId))
+            } catch (e: Exception) {
+                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            }
         }
     }
 

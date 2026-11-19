@@ -1,6 +1,7 @@
 package com.example.panol.ui.viewmodel
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +11,7 @@ import com.example.panol.data.EstadoSolicitud
 import com.example.panol.data.Sesion
 import com.example.panol.data.database.AppDatabase
 import com.example.panol.data.local.entity.SolicitudEntity
+import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.MisSolicitudesModel
 import kotlinx.coroutines.launch
 
@@ -19,27 +21,36 @@ class MisSolicitudesViewModel : ViewModel() {
     var uiState by mutableStateOf(MisSolicitudesModel())
         private set
 
-    // Lee las solicitudes, sus equipos y el contador del carrito
+    // Lee las solicitudes del docente desde el microservicio y el carrito desde Room
     fun cargarSolicitudes(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
             val usuarioId = Sesion.usuario?.id ?: return@launch
-            val solicitudes = db.solicitudDao().obtenerPorUsuario(usuarioId)
-            uiState = uiState.copy(
-                solicitudes = solicitudes,
-                detalles = solicitudes.flatMap { db.solicitudDao().obtenerDetalles(it.id) },
-                unidadesCarrito = db.carritoDao().contarUnidades(usuarioId)
-            )
+            val unidades = db.carritoDao().contarUnidades(usuarioId)
+            try {
+                val resultado = PanolRepository.solicitudesDe(usuarioId)
+                uiState = uiState.copy(
+                    solicitudes = resultado.map { it.solicitud },
+                    detalles = resultado.flatMap { it.detalles },
+                    unidadesCarrito = unidades
+                )
+            } catch (e: Exception) {
+                uiState = uiState.copy(unidadesCarrito = unidades)
+                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            }
         }
     }
 
-    // Busca las solicitudes sin avisar, las marca como notificadas y las devuelve
+    // Busca las solicitudes sin avisar, las marca como notificadas en el servidor y las devuelve
     suspend fun obtenerYMarcarNotificadas(context: Context): List<SolicitudEntity> {
-        val db = AppDatabase.getDatabase(context)
         val usuarioId = Sesion.usuario?.id ?: return emptyList()
-        val nuevas = db.solicitudDao().obtenerSinNotificar(usuarioId)
-        nuevas.forEach { db.solicitudDao().marcarNotificada(it.id) }
-        return nuevas
+        return try {
+            val nuevas = PanolRepository.sinNotificar(usuarioId)
+            nuevas.forEach { PanolRepository.marcarNotificada(it.id) }
+            nuevas
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     // Quita el filtro de estado
@@ -57,8 +68,11 @@ class MisSolicitudesViewModel : ViewModel() {
     fun onCancelarConfirmado(context: Context, solicitud: SolicitudEntity) {
         if (solicitud.estado != EstadoSolicitud.PENDIENTE) return
         viewModelScope.launch {
-            val db = AppDatabase.getDatabase(context)
-            db.solicitudDao().actualizarEstado(solicitud.id, EstadoSolicitud.CANCELADA)
+            try {
+                PanolRepository.cancelar(solicitud.id)
+            } catch (e: Exception) {
+                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            }
             cargarSolicitudes(context)
         }
     }

@@ -13,6 +13,7 @@ import com.example.panol.data.Sesion
 import com.example.panol.data.database.AppDatabase
 import com.example.panol.data.local.entity.DetalleSolicitudEntity
 import com.example.panol.data.local.entity.SolicitudEntity
+import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.SolicitudModel
 import com.example.panol.ui.screen.vibrar
 import kotlinx.coroutines.launch
@@ -153,7 +154,7 @@ class SolicitudViewModel : ViewModel() {
         }
     }
 
-    // Guarda la solicitud con sus equipos, vacía el carrito y avisa a la pantalla
+    // Envía la solicitud al microservicio, vacía el carrito y avisa a la pantalla
     fun onConfirmarEnvio(context: Context, onSuccess: () -> Unit) {
         uiState = uiState.copy(mostrarConfirmacion = false)
         viewModelScope.launch {
@@ -165,33 +166,39 @@ class SolicitudViewModel : ViewModel() {
                 return@launch
             }
 
-            val solicitudId = db.solicitudDao().insertarSolicitud(
-                SolicitudEntity(
-                    usuarioId = usuarioId,
-                    sala = uiState.sala,
-                    fechaInicio = armarMillis(uiState.horaInicio),
-                    fechaDevolucion = armarMillis(uiState.horaDevolucion),
-                    asignatura = uiState.asignatura.trim(),
-                    observaciones = uiState.observaciones.trim(),
-                    estado = EstadoSolicitud.PENDIENTE,
-                    fechaCreacion = System.currentTimeMillis()
-                )
-            ).toInt()
-
-            db.solicitudDao().insertarDetalles(
-                items.map { item ->
-                    DetalleSolicitudEntity(
-                        solicitudId = solicitudId,
-                        equipoId = item.equipoId,
-                        nombreEquipo = item.nombreEquipo,
-                        categoria = item.categoria,
-                        cantidad = item.cantidad
-                    )
-                }
+            val solicitud = SolicitudEntity(
+                usuarioId = usuarioId,
+                sala = uiState.sala,
+                fechaInicio = armarMillis(uiState.horaInicio),
+                fechaDevolucion = armarMillis(uiState.horaDevolucion),
+                asignatura = uiState.asignatura.trim(),
+                observaciones = uiState.observaciones.trim(),
+                estado = EstadoSolicitud.PENDIENTE,
+                fechaCreacion = System.currentTimeMillis()
             )
-            db.carritoDao().vaciarCarrito(usuarioId)
-            Sesion.solicitudCreadaId = solicitudId
-            onSuccess()
+            val detalles = items.map { item ->
+                DetalleSolicitudEntity(
+                    solicitudId = 0,
+                    equipoId = item.equipoId,
+                    nombreEquipo = item.nombreEquipo,
+                    categoria = item.categoria,
+                    cantidad = item.cantidad
+                )
+            }
+
+            try {
+                val solicitudId = PanolRepository.crearSolicitud(
+                    solicitud,
+                    Sesion.usuario?.nombre ?: "",
+                    detalles
+                )
+                db.carritoDao().vaciarCarrito(usuarioId)
+                Sesion.solicitudCreadaId = solicitudId
+                onSuccess()
+            } catch (e: Exception) {
+                // Por ejemplo: la regla de 3 horas que valida también el servidor
+                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            }
         }
     }
 }
