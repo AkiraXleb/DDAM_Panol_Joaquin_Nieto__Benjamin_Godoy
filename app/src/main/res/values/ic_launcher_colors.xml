@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Azul del aro del logo, para que el icono adaptable se vea continuo -->
+    <color name="ic_launcher_fondo">#042A68</color>
+</resources>
