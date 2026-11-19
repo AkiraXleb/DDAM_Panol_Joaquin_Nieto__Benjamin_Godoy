@@ -61,8 +61,8 @@ fun LoginScreen(
     val desplazamiento = remember { Animatable(0f) }
     LaunchedEffect(state.errorTrigger) {
         if (state.errorTrigger > 0) {
-            for (valor in listOf(-12f, 12f, -8f, 8f, 0f)) {
-                desplazamiento.animateTo(valor, tween(50))
+            for (valor in listOf(-5f, 5f, -3f, 3f, 0f)) {
+                desplazamiento.animateTo(valor, tween(80))
             }
         }
     }

@@ -53,9 +53,9 @@ fun ConfirmacionScreen(
     // Pulso del check
     val escala = remember { Animatable(1f) }
     LaunchedEffect(Unit) {
-        repeat(3) {
-            escala.animateTo(1.25f, tween(400))
-            escala.animateTo(1f, tween(400))
+        repeat(2) {
+            escala.animateTo(1.1f, tween(500))
+            escala.animateTo(1f, tween(500))
         }
     }
 
