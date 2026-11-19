@@ -1,6 +1,16 @@
 package com.example.panol.ui.screen
 
 import androidx.compose.foundation.layout.Column
+import com.example.panol.R
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,6 +73,16 @@ fun PerfilScreen(
         ) {
             Text("Mi perfil", style = MaterialTheme.typography.titleLarge)
 
+            // Foto de perfil (o iniciales si el usuario no tiene foto)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                AvatarPerfil(nombre = state.nombre, correo = state.correo)
+            }
+
             Card(modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp)) {
@@ -116,5 +136,43 @@ private fun DatoPerfil(titulo: String, valor: String) {
         .padding(vertical = 4.dp)) {
         Text(titulo, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(120.dp))
         Text(valor, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+// Foto del usuario según su correo; si no tiene, círculo con sus iniciales
+@Composable
+private fun AvatarPerfil(nombre: String, correo: String) {
+    val foto = when (correo) {
+        "profesora.patricia@escuelamarcelapaz.cl" -> R.drawable.perfil_docente
+        "ti.roberto@escuelamarcelapaz.cl" -> R.drawable.perfil_ti
+        else -> null
+    }
+    if (foto != null) {
+        Image(
+            painter = painterResource(foto),
+            contentDescription = "Foto de perfil",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+        )
+    } else {
+        val iniciales = nombre.split(" ")
+            .filter { it.isNotBlank() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = iniciales,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     }
 }
