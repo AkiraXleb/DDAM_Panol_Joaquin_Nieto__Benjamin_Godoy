@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.panol.data.Sesion
 import com.example.panol.data.database.AppDatabase
 import com.example.panol.data.local.entity.CarritoItemEntity
+import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.CarritoModel
 import kotlinx.coroutines.launch
 
@@ -19,15 +20,18 @@ class CarritoViewModel : ViewModel() {
     var uiState by mutableStateOf(CarritoModel())
         private set
 
-    // Lee los items del carrito y los equipos desde Room
+    // Lee los items del carrito desde Room y el stock actual desde el microservicio
     fun cargarCarrito(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
             val usuarioId = Sesion.usuario?.id ?: return@launch
-            uiState = uiState.copy(
-                items = db.carritoDao().obtenerPorUsuario(usuarioId),
-                equipos = db.equipoDao().obtenerTodos()
-            )
+            val items = db.carritoDao().obtenerPorUsuario(usuarioId)
+            try {
+                uiState = uiState.copy(items = items, equipos = PanolRepository.equipos())
+            } catch (e: Exception) {
+                uiState = uiState.copy(items = items)
+                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            }
         }
     }
 

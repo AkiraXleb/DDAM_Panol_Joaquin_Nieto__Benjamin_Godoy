@@ -16,9 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.panol.R
+import com.example.panol.data.Constantes
+import com.example.panol.data.Sesion
 import com.example.panol.ui.navigation.Routes
 
-// Barra inferior con Catálogo, Carrito, Solicitudes y Perfil
+// Barra inferior según el rol: Catálogo, Carrito, Solicitudes y Perfil (docente) o Gestión y Perfil (Encargado TI)
 @Composable
 fun BarraInferior(
     rutaActual: String,
@@ -31,18 +33,24 @@ fun BarraInferior(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ItemBarra("Catálogo", R.drawable.ic_catalogo, rutaActual == Routes.CATALOGO) {
-                onNavegar(Routes.CATALOGO)
-            }
-            ItemBarra(
-                if (unidadesCarrito > 0) "Carrito ($unidadesCarrito)" else "Carrito",
-                R.drawable.ic_carrito,
-                rutaActual == Routes.CARRITO
-            ) {
-                onNavegar(Routes.CARRITO)
-            }
-            ItemBarra("Solicitudes", R.drawable.ic_solicitudes, rutaActual == Routes.MIS_SOLICITUDES) {
-                onNavegar(Routes.MIS_SOLICITUDES)
+            if (Sesion.usuario?.cargo == Constantes.CARGO_TI) {
+                ItemBarra("Gestión", R.drawable.ic_solicitudes, rutaActual == Routes.GESTION) {
+                    onNavegar(Routes.GESTION)
+                }
+            } else {
+                ItemBarra("Catálogo", R.drawable.ic_catalogo, rutaActual == Routes.CATALOGO) {
+                    onNavegar(Routes.CATALOGO)
+                }
+                ItemBarra(
+                    if (unidadesCarrito > 0) "Carrito ($unidadesCarrito)" else "Carrito",
+                    R.drawable.ic_carrito,
+                    rutaActual == Routes.CARRITO
+                ) {
+                    onNavegar(Routes.CARRITO)
+                }
+                ItemBarra("Solicitudes", R.drawable.ic_solicitudes, rutaActual == Routes.MIS_SOLICITUDES) {
+                    onNavegar(Routes.MIS_SOLICITUDES)
+                }
             }
             ItemBarra("Perfil", R.drawable.ic_perfil, rutaActual == Routes.PERFIL) {
                 onNavegar(Routes.PERFIL)
