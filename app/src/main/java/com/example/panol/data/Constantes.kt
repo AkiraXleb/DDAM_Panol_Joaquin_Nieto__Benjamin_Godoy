@@ -36,4 +36,5 @@ object Constantes {
     const val DOMINIO_CORREO = "@escuelamarcelapaz.cl"
     const val MAX_UNIDADES_POR_EQUIPO = 3
     const val HORAS_ANTICIPACION = 3
+    const val CARGO_TI = "Encargado TI"
 }
