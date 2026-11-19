@@ -9,11 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.panol.data.Constantes
+import com.example.panol.data.Sesion
 import com.example.panol.ui.screen.CarritoScreen
 import com.example.panol.ui.screen.CatalogoScreen
 import com.example.panol.ui.screen.ConfirmacionScreen
 import com.example.panol.ui.screen.DetalleScreen
 import com.example.panol.ui.screen.FormularioScreen
+import com.example.panol.ui.screen.GestionScreen
 import com.example.panol.ui.screen.LoginScreen
 import com.example.panol.ui.screen.MisSolicitudesScreen
 import com.example.panol.ui.screen.PerfilScreen
@@ -28,6 +31,12 @@ object Routes {
     const val FORMULARIO = "formulario"
     const val CONFIRMACION = "confirmacion"
     const val PERFIL = "perfil"
+    const val GESTION = "gestion"
+}
+
+// Pantalla de inicio según el rol: el Encargado TI gestiona, el resto solicita
+private fun rutaInicio(): String {
+    return if (Sesion.usuario?.cargo == Constantes.CARGO_TI) Routes.GESTION else Routes.CATALOGO
 }
 
 // Define las rutas de la app y cómo se navega entre pantallas
@@ -35,17 +44,18 @@ object Routes {
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    // Navegación de la barra inferior, sin duplicar el Catálogo en la pila
+    // Navegación de la barra inferior, sin duplicar la pantalla de inicio del rol en la pila
     val navegar: (String) -> Unit = { ruta ->
+        val inicio = rutaInicio()
         navController.navigate(ruta) {
-            popUpTo(Routes.CATALOGO) { inclusive = ruta == Routes.CATALOGO }
+            popUpTo(inicio) { inclusive = ruta == inicio }
         }
     }
 
     NavHost(navController = navController, startDestination = Routes.LOGIN) {
         composable(Routes.LOGIN) {
             LoginScreen(onLoginSuccess = {
-                navController.navigate(Routes.CATALOGO) {
+                navController.navigate(rutaInicio()) {
                     popUpTo(Routes.LOGIN) { inclusive = true }
                 }
             })
@@ -79,13 +89,15 @@ fun AppNavigation() {
             )
         }
         composable(Routes.CONFIRMACION) { ConfirmacionScreen(onNavegar = navegar) }
+        composable(Routes.GESTION) { GestionScreen(onNavegar = navegar) }
         composable(Routes.MIS_SOLICITUDES) { MisSolicitudesScreen(onNavegar = navegar) }
         composable(Routes.PERFIL) {
             PerfilScreen(
                 onNavegar = navegar,
                 onCerrarSesion = {
+                    // Limpia toda la pila, sin importar el rol que estaba conectado
                     navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.CATALOGO) { inclusive = true }
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             )
