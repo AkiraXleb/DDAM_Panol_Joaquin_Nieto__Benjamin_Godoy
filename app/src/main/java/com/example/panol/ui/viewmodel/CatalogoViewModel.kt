@@ -23,8 +23,10 @@ class CatalogoViewModel : ViewModel() {
         private set
 
     // Lee los equipos desde el microservicio y el contador del carrito desde Room
-    fun cargarDatos(context: Context) {
+    // manual = true cuando el usuario arrastra hacia abajo para recargar
+    fun cargarDatos(context: Context, manual: Boolean = false) {
         viewModelScope.launch {
+            if (manual) uiState = uiState.copy(actualizando = true)
             val db = AppDatabase.getDatabase(context)
             val usuarioId = Sesion.usuario?.id ?: 0
             val unidades = db.carritoDao().contarUnidades(usuarioId)
@@ -34,6 +36,8 @@ class CatalogoViewModel : ViewModel() {
             } catch (e: Exception) {
                 uiState = uiState.copy(unidadesCarrito = unidades)
                 Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+            } finally {
+                uiState = uiState.copy(actualizando = false)
             }
         }
     }

@@ -8,7 +8,8 @@ data class CatalogoModel(
     val equipos: List<EquipoEntity> = emptyList(),
     val busqueda: String = "",
     val categoriaSeleccionada: String = "",
-    val unidadesCarrito: Int = 0
+    val unidadesCarrito: Int = 0,
+    val actualizando: Boolean = false
 ) {
     // Equipos que cumplen la búsqueda y la categoría
     val equiposFiltrados: List<EquipoEntity>

@@ -20,7 +20,9 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.CatalogoViewModel
 
 // Pantalla del catálogo con buscador, filtros y lista de equipos
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogoScreen(
     onVerDetalle: () -> Unit,
@@ -119,18 +122,28 @@ fun CatalogoScreen(
                 Text("No se encontraron equipos", style = MaterialTheme.typography.bodyMedium)
             }
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(state.equiposFiltrados) { equipo ->
-                    TarjetaEquipo(
-                        equipo = equipo,
-                        onVerDetalle = {
-                            Sesion.equipoSeleccionadoId = equipo.id
-                            onVerDetalle()
-                        },
-                        onAgregar = { viewModel.onAgregarClick(context, equipo) }
-                    )
+            // Solo se recarga si el usuario arrastra el dedo hacia abajo
+            PullToRefreshBox(
+                isRefreshing = state.actualizando,
+                onRefresh = { viewModel.cargarDatos(context, manual = true) },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.equiposFiltrados) { equipo ->
+                        TarjetaEquipo(
+                            equipo = equipo,
+                            onVerDetalle = {
+                                Sesion.equipoSeleccionadoId = equipo.id
+                                onVerDetalle()
+                            },
+                            onAgregar = { viewModel.onAgregarClick(context, equipo) }
+                        )
+                    }
+                    item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
-                item { Spacer(modifier = Modifier.height(8.dp)) }
             }
         }
     }
