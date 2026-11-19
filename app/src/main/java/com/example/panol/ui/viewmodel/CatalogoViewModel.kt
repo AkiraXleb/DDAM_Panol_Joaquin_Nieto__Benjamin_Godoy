@@ -26,18 +26,23 @@ class CatalogoViewModel : ViewModel() {
     // manual = true cuando el usuario arrastra hacia abajo para recargar
     fun cargarDatos(context: Context, manual: Boolean = false) {
         viewModelScope.launch {
+            uiState = uiState.copy(cargando = true)
             if (manual) uiState = uiState.copy(actualizando = true)
             val db = AppDatabase.getDatabase(context)
             val usuarioId = Sesion.usuario?.id ?: 0
             val unidades = db.carritoDao().contarUnidades(usuarioId)
             try {
                 val equipos = PanolRepository.equipos()
-                uiState = uiState.copy(equipos = equipos, unidadesCarrito = unidades)
+                uiState = uiState.copy(equipos = equipos, unidadesCarrito = unidades, error = "")
             } catch (e: Exception) {
-                uiState = uiState.copy(unidadesCarrito = unidades)
-                Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
+                val mensaje = PanolRepository.mensajeDeError(e)
+                uiState = uiState.copy(unidadesCarrito = unidades, error = mensaje)
+                // Si ya hay equipos en pantalla solo avisa, si no se muestra la tarjeta con "Reintentar"
+                if (uiState.equipos.isNotEmpty()) {
+                    Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show()
+                }
             } finally {
-                uiState = uiState.copy(actualizando = false)
+                uiState = uiState.copy(actualizando = false, cargando = false)
             }
         }
     }

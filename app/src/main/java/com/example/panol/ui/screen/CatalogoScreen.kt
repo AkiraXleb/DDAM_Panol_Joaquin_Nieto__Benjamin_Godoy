@@ -1,6 +1,7 @@
 package com.example.panol.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -78,6 +80,13 @@ fun CatalogoScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
+            // Saludo con el primer nombre del usuario
+            Text(
+                text = "Hola, ${Sesion.usuario?.nombre.orEmpty().substringBefore(" ")}. ¿Qué deseas solicitar hoy?",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+
             OutlinedTextField(
                 value = state.busqueda,
                 onValueChange = { viewModel.onBusquedaChanged(it) },
@@ -85,7 +94,7 @@ fun CatalogoScreen(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(top = 8.dp)
             )
 
             val coloresChip = FilterChipDefaults.filterChipColors(
@@ -118,7 +127,31 @@ fun CatalogoScreen(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            if (state.equiposFiltrados.isEmpty()) {
+            if (state.cargando && state.equipos.isEmpty()) {
+                // Mientras llegan los datos desde AWS
+                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (state.error.isNotEmpty() && state.equipos.isEmpty()) {
+                // Sin conexión con el servidor: tarjeta con botón para reintentar
+                Card(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("No se pudo conectar con el servidor", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = state.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        Button(
+                            onClick = { viewModel.cargarDatos(context, manual = true) },
+                            colors = coloresBotonAccion(),
+                            modifier = Modifier.padding(top = 12.dp)
+                        ) {
+                            Text("Reintentar")
+                        }
+                    }
+                }
+            } else if (state.equiposFiltrados.isEmpty()) {
                 Text("No se encontraron equipos", style = MaterialTheme.typography.bodyMedium)
             }
 
