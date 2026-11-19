@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.panol.data.EstadoSolicitud
+import com.example.panol.data.Sesion
 import com.example.panol.data.local.entity.DetalleSolicitudEntity
 import com.example.panol.data.local.entity.SolicitudEntity
 import com.example.panol.ui.components.BarraInferior
@@ -114,6 +115,12 @@ fun GestionScreen(
                     Text(if (state.cargando) "Cargando..." else "Actualizar")
                 }
             }
+
+            Text(
+                text = "Hola, ${Sesion.usuario?.nombre.orEmpty().substringBefore(" ")}. ¿Qué deseas gestionar hoy?",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
             // Aviso de solicitudes pendientes
             if (state.pendientes > 0) {
