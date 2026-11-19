@@ -199,9 +199,9 @@ private fun TarjetaSolicitud(
     // Temblor de la tarjeta
     val transicion = rememberInfiniteTransition(label = "temblor")
     val desplazamiento by transicion.animateFloat(
-        initialValue = -6f,
-        targetValue = 6f,
-        animationSpec = infiniteRepeatable(tween(60), RepeatMode.Reverse),
+        initialValue = -2f,
+        targetValue = 2f,
+        animationSpec = infiniteRepeatable(tween(120), RepeatMode.Reverse),
         label = "desplazamiento"
     )
 

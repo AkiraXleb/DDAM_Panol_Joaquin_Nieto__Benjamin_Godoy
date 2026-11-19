@@ -47,8 +47,12 @@ fun AppNavigation() {
     // Navegación de la barra inferior, sin duplicar la pantalla de inicio del rol en la pila
     val navegar: (String) -> Unit = { ruta ->
         val inicio = rutaInicio()
-        navController.navigate(ruta) {
-            popUpTo(inicio) { inclusive = ruta == inicio }
+        val actual = navController.currentBackStackEntry?.destination?.route
+        // Si ya estás en esa pantalla no se navega, así no se vuelve a cargar al tocar repetidamente
+        if (ruta != actual) {
+            navController.navigate(ruta) {
+                popUpTo(inicio) { inclusive = ruta == inicio }
+            }
         }
     }
 
