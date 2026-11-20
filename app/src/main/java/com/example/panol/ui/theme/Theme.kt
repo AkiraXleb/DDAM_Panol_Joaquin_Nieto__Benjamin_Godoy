@@ -27,7 +27,12 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = SuperficieOscura,
     onSurfaceVariant = BordeSuave,
     error = ErrorContenedor,
-    onError = ErrorSobreContenedor
+    onError = ErrorSobreContenedor,
+    surfaceContainerLowest = FondoOscuro,
+    surfaceContainerLow = Color(0xFF212425),
+    surfaceContainer = Color(0xFF262A2B),
+    surfaceContainerHigh = SuperficieOscura,
+    surfaceContainerHighest = Color(0xFF343839)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -54,7 +59,13 @@ private val LightColorScheme = lightColorScheme(
     error = Error,
     onError = Color.White,
     errorContainer = ErrorContenedor,
-    onErrorContainer = ErrorSobreContenedor
+    onErrorContainer = ErrorSobreContenedor,
+    // Tarjetas y barras blancas sobre el fondo gris claro
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Color.White,
+    surfaceContainer = Color.White,
+    surfaceContainerHigh = Color(0xFFF8FAFB),
+    surfaceContainerHighest = Color.White
 )
 
 // Tema de la app con la paleta del mockup, sin dynamic color

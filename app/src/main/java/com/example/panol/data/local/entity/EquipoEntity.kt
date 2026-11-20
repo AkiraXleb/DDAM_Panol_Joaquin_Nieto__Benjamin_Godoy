@@ -16,6 +16,7 @@ data class EquipoEntity(
     val descripcion: String,
     val stockTotal: Int,
     val stockDisponible: Int,
+    val stockMantenimiento: Int = 0,
     val estado: String,
     val ubicacion: String
 )

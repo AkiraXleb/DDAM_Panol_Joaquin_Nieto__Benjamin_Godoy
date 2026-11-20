@@ -37,4 +37,19 @@ object Constantes {
     const val MAX_UNIDADES_POR_EQUIPO = 3
     const val HORAS_ANTICIPACION = 3
     const val CARGO_TI = "Encargado TI"
+    const val CARGO_SUPER_ADMIN = "Super Admin"
+
+    // Prefijos permitidos en el correo: prof. (Docente), insp. (Inspector), ti. (Encargado TI), admin. (Super Admin)
+    val PREFIJOS_CORREO = listOf("prof", "insp", "ti", "admin")
+
+    // Revisa que el correo sea prefijo.nombre@escuelamarcelapaz.cl, con prefijo válido y nombre en minúsculas o números
+    fun correoValido(correo: String): Boolean {
+        if (!correo.endsWith(DOMINIO_CORREO)) return false
+        val partes = correo.removeSuffix(DOMINIO_CORREO).split(".")
+        if (partes.size != 2) return false
+        val nombre = partes[1]
+        return partes[0] in PREFIJOS_CORREO &&
+            nombre.isNotEmpty() &&
+            nombre.all { it in 'a'..'z' || it in '0'..'9' }
+    }
 }

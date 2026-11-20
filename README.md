@@ -1,106 +1,72 @@
-# MPAZ Pañol — Sistema móvil de préstamo de equipos tecnológicos
+# MPAZ Pañol
 
-Aplicación Android para la **Escuela Escritora Marcela Paz** (San Bernardo). Digitaliza la reserva y el préstamo de equipos del pañol (notebooks, proyectores, parlantes, kits de robótica, equipos de red, etc.), que antes se pedían por correo y sin registro.
+Aplicación Android para gestionar el préstamo de equipos del **Pañol de la Escuela Marcela Paz**.
+Los docentes solicitan equipos desde su teléfono y el Encargado TI revisa, acepta, entrega y recibe las devoluciones.
 
-Esta entrega  implementa el flujo completo del **perfil Solicitante** (docentes, inspectoría, UTP y dirección). La consola del encargado TI queda para la siguiente etapa.
-
-> **Asignatura:** Desarrollo de Aplicaciones Móviles, DuocUC Sede Maipú
-> Todos los datos de la app son **ficticios**.
+Proyecto de **DSY1105 – Desarrollo de Aplicaciones Móviles** (DuocUC Maipú, sección 010D) – Experiencia 3.
 
 ## Integrantes
 
-| Integrante | GitHub | Responsabilidades |
-|---|---|---|
-| **Joaquín Nieto** | [AkiraXleb](https://github.com/AkiraXleb) | Capa de datos (Room: entidades, DAOs, base de datos, datos iniciales), Login, Catálogo, Detalle de equipo, Perfil, componentes reutilizables (Header, BarraInferior, ChipEstado, MensajeError), tema visual y navegación base |
-| **Benjamín Godoy** | [benjaxleb](https://github.com/benjaxleb) | Carrito de solicitud, Formulario con regla de 3 horas, Confirmación, Mis Solicitudes y recursos nativos (vibración + linterna) |
+| Integrante | Aporte principal |
+|---|---|
+| **Joaquín Nieto** | Microservicio `solicitudes-service`, despliegue en AWS, capa Retrofit + `PanolRepository`, ViewModels, Login/Catálogo/Detalle/Perfil, mejoras visuales e ícono |
+| **Benjamín Godoy** | Microservicio `equipos-service`, rol Encargado TI (Gestión), Carrito, Formulario, Confirmación, Mis Solicitudes y recursos nativos |
+
+## Arquitectura
+
+- **App Android**: Kotlin + Jetpack Compose, patrón **MVVM** (Screen → ViewModel → Repository → API / Room).
+- **Backend**: dos microservicios Spring Boot (Java 21) + PostgreSQL con Docker Compose en **AWS EC2** (Elastic IP `32.197.25.36`).
+  - `equipos-service` → `:8081`
+  - `solicitudes-service` → `:8082`
+- **Room**: solo usuarios (login) y carrito local.
+- Diagramas en la rama `documents`: `docs/arquitectura_app.jpg` y `docs/microservicios.png`.
+
+Backend: https://github.com/AkiraXleb/DDAM_Panol_Backend_Joaquin_Nieto__Benjamin_Godoy
 
 ## Tecnologías
 
-- **Kotlin** + **Jetpack Compose** + **Material Design 3**
-- Arquitectura **MVVM** (Model · ViewModel · View)
-- Persistencia local con **SQLite a través de Room** (KSP)
-- **Navigation Compose** para la navegación entre pantallas
-- Android Studio · `minSdk 26` · `targetSdk 37`
-- Git / GitHub con **Git Flow** y planificación en **Trello**
+Kotlin, Jetpack Compose (Material 3), Navigation Compose, Room, Retrofit + OkHttp + Gson, ViewModel/StateFlow, Coroutines; JUnit/Mockito en el backend.
 
-## Funcionalidades implementadas
+## Roles y funcionalidades
 
-| Pantalla | Funcionalidad |
-|---|---|
-| **Login** | Ingreso con correo institucional y contraseña validados contra Room. Error por campo con ícono y animación de temblor. |
-| **Catálogo** | Lista de equipos con búsqueda, filtro por categoría, chip de estado con color (Disponible, Reservado, Prestado, En Mantenimiento, Fuera de Servicio) y stock disponible. Botón para agregar al carrito, deshabilitado si no hay stock. |
-| **Detalle** | Datos completos del equipo (código, marca, modelo, ubicación y stock) y selector de cantidad validado (mínimo 1, máximo 3 por docente y nunca más que el stock). |
-| **Carrito** | Borrador del préstamo guardado en Room: cambiar cantidades, eliminar con confirmación y resumen de equipos y unidades. |
-| **Formulario de solicitud** | Sala (menú desplegable), fecha (DatePicker), hora de inicio y de devolución (TimePicker), asignatura y observaciones. **Regla crítica: mínimo 3 horas de anticipación**. Si no se cumple, se muestra una advertencia y se bloquea el envío. Diálogo de confirmación antes de enviar. |
-| **Confirmación** | N° de solicitud, estado Pendiente, datos del solicitante, sala, horario y equipos, con animación de pulso. |
-| **Mis Solicitudes** | Seguimiento de las solicitudes con estado (Pendiente, Aceptada, Rechazada, Entregada, Devuelta, Cancelada), filtros, motivo de rechazo y cancelación de solicitudes pendientes. |
-| **Perfil** | Datos del usuario y cierre de sesión con confirmación. |
+**Docente / solicitante**
+- Inicio de sesión validado.
+- Catálogo con stock y *pull-to-refresh*.
+- Detalle, carrito y formulario de solicitud (validación de fecha, hora, cantidad y motivo; máximo 3 horas).
+- Seguimiento de solicitudes (Pendiente, Aceptada, Rechazada, Cancelada, Entregada, Devuelta).
+- Perfil con foto.
 
-### Formularios y validaciones
-- Toda la validación está en los **ViewModel**, desacoplada de las pantallas.
-- Cada campo muestra su propio error (`isError` + mensaje con ícono).
-- Al intentar enviar con errores, el formulario **tiembla** (animación con `Animatable`).
+**Encargado TI**
+- Consola de Gestión: aceptar/rechazar, marcar entregada y devuelta.
 
-### Animaciones
-- Temblor del formulario ante errores (Login y Formulario).
-- Mensajes de error y advertencia de 3 horas con `AnimatedVisibility`.
-- Pulso del check en la Confirmación.
-- Temblor de la tarjeta de una solicitud cuando llega su resultado (`rememberInfiniteTransition`).
+El rol se determina por el cargo del usuario (`Encargado TI` abre la consola de gestión).
 
-### Recursos nativos
-| Recurso | Uso en el caso |
-|---|---|
-| **Vibración** | Avisa el resultado de una solicitud y vibra corto cuando la hora rompe la regla de 3 horas. |
-| **Linterna** (LED del flash) | Parpadea **2 veces si la solicitud fue aceptada** y **1 vez si fue rechazada**, junto con la vibración, al abrir Mis Solicitudes. Usa `setTorchMode`, sin cámara fotográfica ni permiso `CAMERA`. |
+## Recursos nativos
 
-Las señales quedan registradas en **Logcat** (filtro `RecursosNativos`), así se pueden revisar también en el emulador.
+- **Vibración**: reglas del formulario violadas y acciones de gestión del Encargado TI.
+- **Linterna**: al abrir *Mis Solicitudes* parpadea 2 veces si hay solicitudes aceptadas y 1 si fueron rechazadas.
 
-## Estructura del proyecto
+Código en `ui/screen/RecursosNativos.kt`.
 
-```
-app/src/main/java/com/example/panol/
-├── data/
-│   ├── Constantes.kt          # estados, categorías, salas y reglas del caso
-│   ├── DatosIniciales.kt      # usuarios, equipos y solicitudes ficticias
-│   ├── Sesion.kt              # usuario conectado e ids entre pantallas
-│   ├── database/AppDatabase.kt
-│   └── local/
-│       ├── dao/               # UsuarioDao, EquipoDao, CarritoDao, SolicitudDao
-│       └── entity/            # Usuario, Equipo, CarritoItem, Solicitud, DetalleSolicitud
-├── ui/
-│   ├── components/            # Header, BarraInferior, ChipEstado, MensajeError
-│   ├── model/                 # estado de cada pantalla (data class)
-│   ├── viewmodel/             # lógica y validaciones de cada pantalla
-│   ├── screen/                # pantallas Compose y RecursosNativos
-│   ├── navigation/            # AppNavigation y Routes
-│   └── theme/                 # colores del mockup
-└── MainActivity.kt
-```
+## Usuarios de prueba
 
-## Usuarios de prueba (ficticios)
-
-| Correo | Contraseña | Cargo |
+| Rol | Correo | Contraseña |
 |---|---|---|
-| `profesora.patricia@escuelamarcelapaz.cl` | `docente123` | Docente (con solicitudes de ejemplo) |
-| `inspector.marcelo@escuelamarcelapaz.cl` | `inspector123` | Inspector |
-| `ti.roberto@escuelamarcelapaz.cl` | `admin123` | Encargado TI (siguiente etapa) |
+| Docente | profesora.patricia@escuelamarcelapaz.cl | docente123 |
+| Inspector | inspector.marcelo@escuelamarcelapaz.cl | inspector123 |
+| Encargado TI | ti.roberto@escuelamarcelapaz.cl | admin123 |
+
+Se cargan en Room solo en la primera instalación (tabla vacía).
 
 ## Cómo ejecutar
 
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/AkiraXleb/DDAM_Panol_Joaquin_Nieto__Benjamin_Godoy.git
-   ```
-2. Abrir la carpeta en **Android Studio** (*File → Open*) y esperar a que termine el *Gradle Sync*.
-3. Ejecutar en un emulador o dispositivo con **Android 8.0 (API 26) o superior**.
-4. Iniciar sesión con uno de los usuarios de prueba.
-5. Para ver los recursos nativos: abrir **Solicitudes** la primera vez (hay una solicitud aceptada y una rechazada sin notificar) y revisar Logcat con el filtro `RecursosNativos`. En un dispositivo físico se ve la linterna y se siente la vibración.
+1. Abrir en Android Studio y sincronizar Gradle.
+2. Ejecutar en emulador o dispositivo Android 8+ con internet.
+3. URLs del servidor en `data/remote/ApiConfig.kt`.
+4. **El servidor AWS solo responde mientras el AWS Academy Learner Lab esté iniciado.**
 
-> Si se cambia alguna entidad de Room, hay que desinstalar la app antes de volver a ejecutarla.
+APK firmado: pestaña **Releases** (v2.0.0). Pruebas: `./gradlew test`.
 
-## Flujo de trabajo (Git Flow)
+## Git Flow
 
-- `main`: versión entregada (tag `v1.0`).
-- `develop`: integración.
-- `feature/backend/<integrante>` y `feature/frontend/<integrante>`: trabajo de cada integrante por capa.
-- `release/v1.0`: preparación de la entrega.
+`main` (entrega) · `develop` (integración) · `feature/*` (PR a develop) · `documents` (diagramas).

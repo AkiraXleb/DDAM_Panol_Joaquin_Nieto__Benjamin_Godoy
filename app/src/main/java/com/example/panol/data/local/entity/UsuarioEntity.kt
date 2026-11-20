@@ -3,7 +3,7 @@ package com.example.panol.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// Tabla de usuarios: nombre, correo, contraseña, cargo y departamento
+// Tabla del usuario con sesión iniciada: los usuarios reales viven en el servidor (usuarios-service)
 @Entity(tableName = "usuarios")
 data class UsuarioEntity(
     @PrimaryKey(autoGenerate = true)

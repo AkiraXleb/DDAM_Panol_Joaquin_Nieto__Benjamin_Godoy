@@ -4,24 +4,24 @@ import androidx.compose.ui.graphics.Color
 
 
 // Teal (primario)
-val Teal = Color(0xFF006973)
-val TealClaro = Color(0xFF4A9DA8)
+val Teal = Color(0xFF0F5C6B)
+val TealClaro = Color(0xFF2F7F8F)
 val TealSobreContenedor = Color(0xFF003035)
 val TealInverso = Color(0xFF82D3DF)
 
 // Naranjo (botones de acción: "Agregar al carrito", "Enviar solicitud")
-val Naranjo = Color(0xFFD8923E)
+val Naranjo = Color(0xFFB85F0A)
 val NaranjoContenedor = Color(0xFFFDB15A)
 val NaranjoSobreContenedor = Color(0xFF734400)
 
 // Azul grisáceo (terciario: filtros, metadata)
-val Terciario = Color(0xFF456179)
+val Terciario = Color(0xFF3B5870)
 val TerciarioContenedor = Color(0xFF7894AE)
 val TerciarioSobreContenedor = Color(0xFF0C2C42)
 
 // Neutros
-val Fondo = Color(0xFFF8FAFA)
-val SuperficieVariante = Color(0xFFE1E3E3)
+val Fondo = Color(0xFFF3F5F7)
+val SuperficieVariante = Color(0xFFE4E8EB)
 val TextoPrincipal = Color(0xFF191C1D)
 val TextoSecundario = Color(0xFF3E494A)
 val Borde = Color(0xFF6F797B)

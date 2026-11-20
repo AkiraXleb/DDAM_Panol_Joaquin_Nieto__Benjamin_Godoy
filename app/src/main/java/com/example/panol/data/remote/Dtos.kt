@@ -12,9 +12,13 @@ data class EquipoDto(
     val descripcion: String? = null,
     val stockTotal: Int? = null,
     val stockDisponible: Int? = null,
+    val stockMantenimiento: Int? = null,
     val estado: String? = null,
     val ubicacion: String? = null
 )
+
+// Cuerpo de PATCH /api/equipos/{id}/mantenimiento: positivo envía a mantenimiento, negativo devuelve al stock
+data class AjusteDto(val cantidad: Int)
 
 data class DetalleDto(
     val id: Long? = null,
@@ -46,4 +50,27 @@ data class SolicitudDto(
 data class CambioEstadoDto(
     val estado: String,
     val motivo: String? = null
+)
+
+// Usuario que devuelve el servidor (nunca trae la contraseña)
+data class UsuarioDto(
+    val id: Long = 0,
+    val nombre: String? = null,
+    val email: String? = null,
+    val cargo: String? = null,
+    val departamento: String? = null
+)
+
+// Cuerpo de POST /api/usuarios/login
+data class LoginDto(
+    val email: String,
+    val password: String
+)
+
+// Cuerpo de POST /api/usuarios. El cargo no se envía: el servidor lo saca del prefijo del correo
+data class NuevoUsuarioDto(
+    val nombre: String,
+    val email: String,
+    val password: String,
+    val departamento: String
 )
