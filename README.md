@@ -15,31 +15,40 @@ Proyecto de **DSY1105 – Desarrollo de Aplicaciones Móviles** (DuocUC Maipú, 
 ## Arquitectura
 
 - **App Android**: Kotlin + Jetpack Compose, patrón **MVVM** (Screen → ViewModel → Repository → API / Room).
-- **Backend**: dos microservicios Spring Boot (Java 21) + PostgreSQL con Docker Compose en **AWS EC2** (Elastic IP `32.197.25.36`).
+- **Backend**: tres microservicios Spring Boot (Java 21) + PostgreSQL con Docker Compose en **AWS EC2** (Elastic IP `32.197.25.36`).
   - `equipos-service` → `:8081`
   - `solicitudes-service` → `:8082`
-- **Room**: solo usuarios (login) y carrito local.
+  - `usuarios-service` → `:8083` (login y administración de usuarios)
+  - `img-service` → `:8084` (imágenes de los equipos; el TI las sube desde Inventario y se ven en Catálogo, Detalle y Carrito)
+- **Room**: sesión iniciada (se guarda el usuario conectado) y carrito local.
 - Diagramas en la rama `documents`: `docs/arquitectura_app.jpg` y `docs/microservicios.png`.
 
 Backend: https://github.com/AkiraXleb/DDAM_Panol_Backend_Joaquin_Nieto__Benjamin_Godoy
 
 ## Tecnologías
 
-Kotlin, Jetpack Compose (Material 3), Navigation Compose, Room, Retrofit + OkHttp + Gson, ViewModel/StateFlow, Coroutines; JUnit/Mockito en el backend.
+Kotlin, Jetpack Compose (Material 3), Navigation Compose, Room, Retrofit + OkHttp + Gson, ViewModel con mutableStateOf, Coroutines; JUnit/Mockito en el backend.
 
 ## Roles y funcionalidades
 
 **Docente / solicitante**
-- Inicio de sesión validado.
+- Inicio de sesión validado contra el servidor; la sesión queda guardada y no se vuelve a pedir hasta cerrar sesión.
 - Catálogo con stock y *pull-to-refresh*.
-- Detalle, carrito y formulario de solicitud (validación de fecha, hora, cantidad y motivo; máximo 3 horas).
+- Detalle, carrito y formulario de solicitud (validación de fecha, hora, cantidad y motivo; el inicio debe ser al menos 3 horas después de ahora).
 - Seguimiento de solicitudes (Pendiente, Aceptada, Rechazada, Cancelada, Entregada, Devuelta).
 - Perfil con foto.
 
 **Encargado TI**
-- Consola de Gestión: aceptar/rechazar, marcar entregada y devuelta.
+- Consola de Gestión: aceptar/rechazar, marcar entregada y devuelta (con sonido de aprobación).
+- Inventario: agregar equipos nuevos y eliminar los que no tengan unidades en préstamo.
 
-El rol se determina por el cargo del usuario (`Encargado TI` abre la consola de gestión).
+**Super Admin**
+- Usuarios: agregar y eliminar usuarios con correo `prefijo.nombre@escuelamarcelapaz.cl`.
+
+**Todos los roles**
+- Perfil: cambiar la foto de perfil desde la cámara o la galería (se guarda en el teléfono).
+
+El rol se determina por el cargo del usuario, que sale del prefijo del correo (`ti.` abre la consola de gestión, `admin.` la de usuarios).
 
 ## Recursos nativos
 
@@ -52,11 +61,15 @@ Código en `ui/screen/RecursosNativos.kt`.
 
 | Rol | Correo | Contraseña |
 |---|---|---|
-| Docente | profesora.patricia@escuelamarcelapaz.cl | docente123 |
-| Inspector | inspector.marcelo@escuelamarcelapaz.cl | inspector123 |
+| Docente | prof.patricia@escuelamarcelapaz.cl | docente123 |
+| Inspector | insp.marcelo@escuelamarcelapaz.cl | inspector123 |
 | Encargado TI | ti.roberto@escuelamarcelapaz.cl | admin123 |
+| Super Admin | admin.panol@escuelamarcelapaz.cl | superadmin123 |
 
-Se cargan en Room solo en la primera instalación (tabla vacía).
+Los usuarios viven en el servidor (`usuarios-service`) y se cargan al arrancar si la tabla está vacía.
+Todos los correos siguen el formato `prefijo.nombre@escuelamarcelapaz.cl` y el prefijo define el cargo:
+`prof.` Docente · `insp.` Inspector · `ti.` Encargado TI · `admin.` Super Admin.
+El Super Admin agrega y elimina usuarios desde la pantalla *Usuarios*.
 
 ## Cómo ejecutar
 
