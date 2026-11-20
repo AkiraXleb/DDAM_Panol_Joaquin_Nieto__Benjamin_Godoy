@@ -19,13 +19,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// ViewModel del Perfil: datos del usuario y cierre de sesión
+/*
+ * ViewModel del Perfil: datos del usuario y cierre de sesión.
+ *
+ * - cargarDatos: Lee los datos del usuario y el contador del carrito.
+ * - onFotoElegida: Guarda la foto elegida en la galería.
+ * - onFotoTomada: Guarda la foto que acaba de tomar la cámara.
+ * - onQuitarFoto: Borra la foto y vuelve a la imagen por defecto.
+ * - avisarResultado: Refresca la foto en pantalla y avisa si se guardó o no.
+ * - onCerrarSesionConfirmado: Borra la sesión (memoria y Room) y avisa a la pantalla.
+ */
 class PerfilViewModel : ViewModel() {
 
     var uiState by mutableStateOf(PerfilModel())
         private set
 
-    // Lee los datos del usuario y el contador del carrito
     fun cargarDatos(context: Context) {
         val usuario = Sesion.usuario ?: return
         uiState = PerfilModel(
@@ -40,7 +48,6 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Guarda la foto elegida en la galería
     fun onFotoElegida(context: Context, uri: Uri) {
         val usuario = Sesion.usuario ?: return
         viewModelScope.launch {
@@ -52,7 +59,6 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Guarda la foto que acaba de tomar la cámara
     fun onFotoTomada(context: Context) {
         val usuario = Sesion.usuario ?: return
         viewModelScope.launch {
@@ -63,7 +69,6 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Borra la foto y vuelve al círculo con las iniciales
     fun onQuitarFoto(context: Context) {
         val usuario = Sesion.usuario ?: return
         archivoFoto(context, usuario.id).delete()
@@ -71,7 +76,6 @@ class PerfilViewModel : ViewModel() {
         Toast.makeText(context, "Foto eliminada", Toast.LENGTH_SHORT).show()
     }
 
-    // Refresca la foto en pantalla y avisa si se guardó o no
     private fun avisarResultado(context: Context, guardada: Boolean) {
         if (guardada) {
             uiState = uiState.copy(fotoVersion = uiState.fotoVersion + 1)
@@ -81,7 +85,6 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Borra la sesión (memoria y Room) y avisa a la pantalla
     fun onCerrarSesionConfirmado(context: Context, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)

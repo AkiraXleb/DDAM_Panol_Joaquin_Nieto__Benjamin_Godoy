@@ -7,16 +7,21 @@ import com.example.panol.data.repository.PanolRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-// Guarda en memoria las imágenes ya descargadas para no pedirlas al servidor cada vez que se abre una pantalla.
-// Si un equipo no tiene imagen también se recuerda (null) hasta que se invalide
+/*
+ * Guarda en memoria las imágenes ya descargadas para no pedirlas al servidor cada vez que se abre una
+ * pantalla. Si un equipo no tiene imagen también se recuerda (null) hasta que se invalide.
+ *
+ * - obtener: Lo que hay en memoria ahora (null si no hay imagen o aún no se descarga).
+ * - cargar: Devuelve la imagen del equipo: de memoria si ya está, si no la descarga. Null si no tiene
+ *   o falla la red.
+ * - invalidar: Olvida la imagen de un equipo (después de subir una nueva o de borrarla).
+ */
 object CacheImagenes {
 
     private val imagenes = HashMap<Int, ImageBitmap?>()
 
-    // Lo que hay en memoria ahora (null si no hay imagen o aún no se descarga)
     fun obtener(equipoId: Int): ImageBitmap? = imagenes[equipoId]
 
-    // Devuelve la imagen del equipo: de memoria si ya está, si no la descarga. Null si no tiene o falla la red
     suspend fun cargar(equipoId: Int): ImageBitmap? {
         if (imagenes.containsKey(equipoId)) return imagenes[equipoId]
         return try {
@@ -32,7 +37,6 @@ object CacheImagenes {
         }
     }
 
-    // Olvida la imagen de un equipo (después de subir una nueva o de borrarla)
     fun invalidar(equipoId: Int) {
         imagenes.remove(equipoId)
     }

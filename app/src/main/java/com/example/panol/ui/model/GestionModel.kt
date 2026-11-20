@@ -4,7 +4,14 @@ import com.example.panol.data.EstadoSolicitud
 import com.example.panol.data.local.entity.DetalleSolicitudEntity
 import com.example.panol.data.local.entity.SolicitudEntity
 
-// Estado de la pantalla Gestión (Encargado TI): todas las solicitudes, filtro y errores
+/*
+ * Estado de la pantalla Gestión (Encargado TI): todas las solicitudes, filtro y errores.
+ *
+ * - solicitudesFiltradas: Solicitudes que cumplen el filtro de estado.
+ * - pendientes: Cantidad de solicitudes esperando respuesta.
+ * - detallesDe: Equipos de una solicitud.
+ * - solicitanteDe: Nombre del docente que hizo la solicitud.
+ */
 data class GestionModel(
     val solicitudes: List<SolicitudEntity> = emptyList(),
     val detalles: List<DetalleSolicitudEntity> = emptyList(),
@@ -13,20 +20,16 @@ data class GestionModel(
     val cargando: Boolean = false,
     val errorMotivo: String = ""
 ) {
-    // Solicitudes que cumplen el filtro de estado
     val solicitudesFiltradas: List<SolicitudEntity>
         get() = solicitudes.filter { estadoSeleccionado.isEmpty() || it.estado == estadoSeleccionado }
 
-    // Cantidad de solicitudes esperando respuesta
     val pendientes: Int
         get() = solicitudes.count { it.estado == EstadoSolicitud.PENDIENTE }
 
-    // Equipos de una solicitud
     fun detallesDe(solicitudId: Int): List<DetalleSolicitudEntity> {
         return detalles.filter { it.solicitudId == solicitudId }
     }
 
-    // Nombre del docente que hizo la solicitud
     fun solicitanteDe(solicitudId: Int): String {
         return nombres[solicitudId].orEmpty().ifEmpty { "Sin nombre" }
     }

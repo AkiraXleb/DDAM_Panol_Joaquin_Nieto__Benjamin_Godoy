@@ -24,13 +24,17 @@ import java.io.File
 // Las imágenes de equipos se suben chicas: 800 px y JPG de calidad 80
 private const val LADO_IMAGEN = 800
 private const val CALIDAD_IMAGEN = 80
-// ViewModel de Inventario (Encargado TI): lista, agrega y elimina equipos en el servidor
+/*
+ * ViewModel de Inventario (Encargado TI): lista, agrega y elimina equipos en el servidor.
+ *
+ * - cargar: Lee todos los equipos del microservicio.
+ * - onNuevoClick: Abre el formulario con los campos vacíos.
+ */
 class InventarioViewModel : ViewModel() {
 
     var uiState by mutableStateOf(InventarioModel())
         private set
 
-    // Lee todos los equipos del microservicio
     fun cargar(context: Context) {
         viewModelScope.launch {
             uiState = uiState.copy(cargando = true)
@@ -43,7 +47,6 @@ class InventarioViewModel : ViewModel() {
         }
     }
 
-    // Abre el formulario con los campos vacíos
     fun onNuevoClick() {
         uiState = uiState.copy(
             mostrarFormulario = true,
@@ -56,8 +59,14 @@ class InventarioViewModel : ViewModel() {
     }
 
     // ---------- Mantenimiento ----------
+    /*
+     * - onMantenimientoClick: Abre el diálogo de mantenimiento del equipo.
+     * - onEnviarMantenimiento: Envía unidades disponibles a mantenimiento.
+     * - onDevolverMantenimiento: Devuelve unidades de mantenimiento al stock disponible.
+     * - validarCantidad: Revisa que la cantidad sea un entero entre 1 y el máximo. Devuelve null (y
+     *   muestra el error) si no sirve.
+     */
 
-    // Abre el diálogo de mantenimiento del equipo
     fun onMantenimientoClick(equipo: EquipoEntity) {
         uiState = uiState.copy(equipoMantenimiento = equipo, cantidadMantenimiento = "1", errorMantenimiento = "")
     }
@@ -70,21 +79,18 @@ class InventarioViewModel : ViewModel() {
         uiState = uiState.copy(equipoMantenimiento = null)
     }
 
-    // Envía unidades disponibles a mantenimiento
     fun onEnviarMantenimiento(context: Context) {
         val equipo = uiState.equipoMantenimiento ?: return
         val cantidad = validarCantidad(equipo.stockDisponible, "disponibles") ?: return
         guardarMantenimiento(context, equipo, cantidad, "$cantidad unidad(es) de ${equipo.nombre} enviadas a mantenimiento")
     }
 
-    // Devuelve unidades de mantenimiento al stock disponible
     fun onDevolverMantenimiento(context: Context) {
         val equipo = uiState.equipoMantenimiento ?: return
         val cantidad = validarCantidad(equipo.stockMantenimiento, "en mantenimiento") ?: return
         guardarMantenimiento(context, equipo, -cantidad, "$cantidad unidad(es) de ${equipo.nombre} devueltas al stock")
     }
 
-    // Revisa que la cantidad sea un entero entre 1 y el máximo. Devuelve null (y muestra el error) si no sirve
     private fun validarCantidad(maximo: Int, descripcion: String): Int? {
         val cantidad = uiState.cantidadMantenimiento.trim().toIntOrNull()
         val error = when {
@@ -113,13 +119,24 @@ class InventarioViewModel : ViewModel() {
     }
 
     // ---------- Imágenes de los equipos (img-service) ----------
+    /*
+     * - onElegirFoto: Indica a quién va la foto que se va a elegir: -1 = equipo nuevo, un id = equipo
+     *   existente.
+     * - onFotoElegida: Foto elegida en la galería.
+     * - onFotoTomada: Foto recién tomada con la cámara.
+     * - procesarFoto: La reduce y, según el destino, la deja lista para el equipo nuevo o la sube al
+     *   equipo elegido.
+     * - onQuitarFoto: Quita la imagen: la del formulario o la que ya tiene el equipo en el servidor.
+     * - onCancelarNuevo: Cierra el formulario.
+     * - validar: Valida cada campo y devuelve true si no hay errores.
+     * - onGuardarClick: Valida y agrega el equipo al inventario.
+     * - onEliminarClick: Elimina un equipo y recarga la lista.
+     */
 
-    // Indica a quién va la foto que se va a elegir: -1 = equipo nuevo, un id = equipo existente
     fun onElegirFoto(destino: Int) {
         uiState = uiState.copy(destinoFoto = destino)
     }
 
-    // Foto elegida en la galería
     fun onFotoElegida(context: Context, uri: Uri) {
         viewModelScope.launch {
             val copia = withContext(Dispatchers.IO) { copiarDeGaleria(context, uri) }
@@ -127,14 +144,12 @@ class InventarioViewModel : ViewModel() {
         }
     }
 
-    // Foto recién tomada con la cámara
     fun onFotoTomada(context: Context) {
         viewModelScope.launch {
             procesarFoto(context, archivoCamara(context))
         }
     }
 
-    // La reduce y, según el destino, la deja lista para el equipo nuevo o la sube al equipo elegido
     private suspend fun procesarFoto(context: Context, origen: File?) {
         val destino = uiState.destinoFoto
         val reducida = File(context.cacheDir, if (destino == -1) "equipo_nuevo.jpg" else "equipo_subida.jpg")
@@ -159,7 +174,6 @@ class InventarioViewModel : ViewModel() {
         }
     }
 
-    // Quita la imagen: la del formulario o la que ya tiene el equipo en el servidor
     fun onQuitarFoto(context: Context) {
         val destino = uiState.destinoFoto
         if (destino == -1) {
@@ -178,7 +192,6 @@ class InventarioViewModel : ViewModel() {
         }
     }
 
-    // Cierra el formulario
     fun onCancelarNuevo() {
         uiState = uiState.copy(mostrarFormulario = false)
     }
@@ -215,7 +228,6 @@ class InventarioViewModel : ViewModel() {
         uiState = uiState.copy(stock = valor, errorStock = "", errorGeneral = "")
     }
 
-    // Valida cada campo y devuelve true si no hay errores
     private fun validar(): Boolean {
         val state = uiState
         val stock = state.stock.trim().toIntOrNull()
@@ -248,7 +260,6 @@ class InventarioViewModel : ViewModel() {
             errorUbicacion.isEmpty() && errorStock.isEmpty()
     }
 
-    // Valida y agrega el equipo al inventario
     fun onGuardarClick(context: Context) {
         if (!validar()) return
         val state = uiState
@@ -284,7 +295,6 @@ class InventarioViewModel : ViewModel() {
         }
     }
 
-    // Elimina un equipo y recarga la lista
     fun onEliminarClick(context: Context, equipo: EquipoEntity) {
         viewModelScope.launch {
             try {
