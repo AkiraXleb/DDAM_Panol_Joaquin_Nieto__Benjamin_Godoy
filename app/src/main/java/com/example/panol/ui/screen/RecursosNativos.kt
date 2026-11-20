@@ -3,6 +3,8 @@ package com.example.panol.ui.screen
 import android.content.Context
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -49,8 +51,22 @@ fun cambiarLinterna(context: Context, encender: Boolean): Boolean {
     }
 }
 
-// Vibra y enciende la linterna: 2 veces si fue aceptada, 1 si fue rechazada
+// Reproduce un sonido corto de aprobación (volumen multimedia del teléfono)
+suspend fun sonarAprobacion(context: Context) {
+    try {
+        val tono = ToneGenerator(AudioManager.STREAM_MUSIC, 90)
+        Log.d(TAG, "Sonido de aprobación")
+        tono.startTone(ToneGenerator.TONE_PROP_ACK, 400)
+        delay(600)
+        tono.release()
+    } catch (e: Exception) {
+        Log.d(TAG, "No se pudo reproducir el sonido: ${e.message}")
+    }
+}
+
+// Vibra y enciende la linterna: 2 veces si fue aceptada, 1 si fue rechazada (y suena si fue aceptada)
 suspend fun senalSolicitud(context: Context, aprobada: Boolean) {
+    if (aprobada) sonarAprobacion(context)
     val repeticiones = if (aprobada) 2 else 1
     Log.d(TAG, "Señal de solicitud ${if (aprobada) "aceptada" else "rechazada"} x$repeticiones")
     repeat(repeticiones) {

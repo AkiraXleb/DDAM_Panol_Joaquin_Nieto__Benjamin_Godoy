@@ -32,9 +32,13 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Borra la sesión y avisa a la pantalla
-    fun onCerrarSesionConfirmado(onSuccess: () -> Unit) {
-        Sesion.cerrarSesion()
-        onSuccess()
+    // Borra la sesión (memoria y Room) y avisa a la pantalla
+    fun onCerrarSesionConfirmado(context: Context, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val db = AppDatabase.getDatabase(context)
+            db.usuarioDao().borrarTodos()
+            Sesion.cerrarSesion()
+            onSuccess()
+        }
     }
 }

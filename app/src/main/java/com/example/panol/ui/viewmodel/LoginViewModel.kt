@@ -7,13 +7,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.panol.data.Constantes
-import com.example.panol.data.DatosIniciales
 import com.example.panol.data.Sesion
 import com.example.panol.data.database.AppDatabase
+import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.LoginModel
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
-// ViewModel del Login: validación de campos y credenciales
+// ViewModel del Login: validación de campos, login contra el servidor y sesión guardada en Room
 class LoginViewModel : ViewModel() {
 
     var uiState by mutableStateOf(LoginModel())
@@ -29,23 +30,30 @@ class LoginViewModel : ViewModel() {
         uiState = uiState.copy(password = valor, errorPassword = "", errorGeneral = "")
     }
 
-    // Carga los datos ficticios si la base de datos está vacía
-    fun cargarDatosIniciales(context: Context) {
+    // Si quedó una sesión guardada en Room entra directo; si no, muestra el formulario
+    fun restaurarSesion(context: Context, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
-            DatosIniciales.cargar(db)
+            val guardado = db.usuarioDao().obtenerSesion()
+            if (guardado != null) {
+                Sesion.usuario = guardado
+                onSuccess()
+            } else {
+                uiState = uiState.copy(restaurando = false)
+            }
         }
     }
 
     // Valida cada campo y devuelve true si no hay errores
     private fun validar(): Boolean {
-        val correo = uiState.correo.trim()
+        val correo = uiState.correo.trim().lowercase()
         val password = uiState.password
 
         val errorCorreo = when {
             correo.isEmpty() -> "Ingresa tu correo"
-            !correo.contains("@") || correo.startsWith("@") -> "El formato del correo no es válido"
+            correo.count { it == '@' } != 1 || correo.startsWith("@") -> "El formato del correo no es válido"
             !correo.endsWith(Constantes.DOMINIO_CORREO) -> "Debe terminar en ${Constantes.DOMINIO_CORREO}"
+            !Constantes.correoValido(correo) -> "Usa prefijo.nombre${Constantes.DOMINIO_CORREO} (prof, insp, ti o admin)"
             else -> ""
         }
         val errorPassword = when {
@@ -63,19 +71,31 @@ class LoginViewModel : ViewModel() {
         return !hayErrores
     }
 
-    // Valida, busca el usuario en Room y guarda la sesión
+    // Valida, inicia sesión en el servidor y guarda la sesión en Room
     fun onLoginClick(context: Context, onSuccess: () -> Unit) {
         if (!validar()) return
 
+        uiState = uiState.copy(cargando = true, errorGeneral = "")
         viewModelScope.launch {
-            val db = AppDatabase.getDatabase(context)
-            val usuario = db.usuarioDao().obtenerPorEmail(uiState.correo.trim())
-            if (usuario != null && usuario.password == uiState.password) {
+            try {
+                val usuario = PanolRepository.login(uiState.correo.trim().lowercase(), uiState.password)
+                // La tabla guarda un solo usuario: se borra el anterior y se guarda el nuevo
+                val db = AppDatabase.getDatabase(context)
+                db.usuarioDao().borrarTodos()
+                db.usuarioDao().insertarUsuario(usuario)
                 Sesion.usuario = usuario
+                uiState = uiState.copy(cargando = false)
                 onSuccess()
-            } else {
+            } catch (e: Exception) {
+                // 401 = correo o contraseña incorrectos; cualquier otro error viene del servidor o de la red
+                val mensaje = if (e is HttpException && e.code() == 401) {
+                    "La contraseña o correo son incorrectos"
+                } else {
+                    PanolRepository.mensajeDeError(e)
+                }
                 uiState = uiState.copy(
-                    errorGeneral = "Correo o contraseña incorrectos",
+                    cargando = false,
+                    errorGeneral = mensaje,
                     errorTrigger = uiState.errorTrigger + 1
                 )
             }

@@ -4,11 +4,15 @@ import com.example.panol.data.EstadoSolicitud
 import com.example.panol.data.local.entity.DetalleSolicitudEntity
 import com.example.panol.data.local.entity.EquipoEntity
 import com.example.panol.data.local.entity.SolicitudEntity
+import com.example.panol.data.local.entity.UsuarioEntity
 import com.example.panol.data.remote.CambioEstadoDto
 import com.example.panol.data.remote.DetalleDto
 import com.example.panol.data.remote.EquipoDto
+import com.example.panol.data.remote.LoginDto
+import com.example.panol.data.remote.NuevoUsuarioDto
 import com.example.panol.data.remote.RetrofitClient
 import com.example.panol.data.remote.SolicitudDto
+import com.example.panol.data.remote.UsuarioDto
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import retrofit2.HttpException
@@ -27,6 +31,7 @@ object PanolRepository {
 
     private val equipoApi get() = RetrofitClient.equipoApi
     private val solicitudApi get() = RetrofitClient.solicitudApi
+    private val usuarioApi get() = RetrofitClient.usuarioApi
 
     // ---------- Equipos (equipos-service) ----------
 
@@ -104,6 +109,27 @@ object PanolRepository {
         solicitudApi.marcarNotificada(id.toLong())
     }
 
+    // ---------- Usuarios (usuarios-service) ----------
+
+    // Inicia sesión en el servidor. Si los datos son incorrectos lanza HttpException 401
+    suspend fun login(email: String, password: String): UsuarioEntity {
+        return usuarioApi.login(LoginDto(email, password)).aEntidad()
+    }
+
+    // Todos los usuarios registrados (Super Admin)
+    suspend fun usuarios(): List<UsuarioEntity> {
+        return usuarioApi.listar().map { it.aEntidad() }
+    }
+
+    // Crea un usuario. El servidor valida el correo y define el cargo por su prefijo
+    suspend fun crearUsuario(nombre: String, email: String, password: String, departamento: String): UsuarioEntity {
+        return usuarioApi.crear(NuevoUsuarioDto(nombre, email, password, departamento)).aEntidad()
+    }
+
+    suspend fun eliminarUsuario(id: Int) {
+        usuarioApi.eliminar(id.toLong())
+    }
+
     // ---------- Mensajes de error ----------
 
     // Convierte un error de red o del servidor en un texto para el usuario
@@ -138,6 +164,16 @@ object PanolRepository {
         stockDisponible = stockDisponible ?: 0,
         estado = estado ?: "",
         ubicacion = ubicacion ?: ""
+    )
+
+    // La contraseña nunca llega a la app, por eso queda vacía
+    private fun UsuarioDto.aEntidad() = UsuarioEntity(
+        id = id.toInt(),
+        nombre = nombre ?: "",
+        email = email ?: "",
+        password = "",
+        cargo = cargo ?: "",
+        departamento = departamento ?: ""
     )
 
     private fun SolicitudDto.aSolicitudConDetalles(): SolicitudConDetalles {

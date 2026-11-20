@@ -11,6 +11,7 @@ import com.example.panol.data.EstadoSolicitud
 import com.example.panol.data.local.entity.SolicitudEntity
 import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.GestionModel
+import com.example.panol.ui.screen.sonarAprobacion
 import com.example.panol.ui.screen.vibrar
 import kotlinx.coroutines.launch
 
@@ -104,6 +105,8 @@ class GestionViewModel : ViewModel() {
                 Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
                 onSuccess()
                 cargar(context, false)
+                // Al aceptar una solicitud también suena el aviso de aprobación
+                if (estado == EstadoSolicitud.ACEPTADA) sonarAprobacion(context)
             } catch (e: Exception) {
                 Toast.makeText(context, PanolRepository.mensajeDeError(e), Toast.LENGTH_LONG).show()
             }

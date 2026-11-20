@@ -31,4 +31,8 @@ object RetrofitClient {
     val solicitudApi: SolicitudApi by lazy {
         crearRetrofit(ApiConfig.SOLICITUDES_URL).create(SolicitudApi::class.java)
     }
+
+    val usuarioApi: UsuarioApi by lazy {
+        crearRetrofit(ApiConfig.USUARIOS_URL).create(UsuarioApi::class.java)
+    }
 }

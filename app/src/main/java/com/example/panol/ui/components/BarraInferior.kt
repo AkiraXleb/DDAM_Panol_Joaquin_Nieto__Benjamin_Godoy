@@ -20,7 +20,7 @@ import com.example.panol.data.Constantes
 import com.example.panol.data.Sesion
 import com.example.panol.ui.navigation.Routes
 
-// Barra inferior según el rol: Catálogo, Carrito, Solicitudes y Perfil (docente) o Gestión y Perfil (Encargado TI)
+// Barra inferior según el rol: Catálogo, Carrito, Solicitudes y Perfil (docente), Gestión y Perfil (Encargado TI) o Usuarios y Perfil (Super Admin)
 @Composable
 fun BarraInferior(
     rutaActual: String,
@@ -33,7 +33,12 @@ fun BarraInferior(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (Sesion.usuario?.cargo == Constantes.CARGO_TI) {
+            val cargo = Sesion.usuario?.cargo
+            if (cargo == Constantes.CARGO_SUPER_ADMIN) {
+                ItemBarra("Usuarios", R.drawable.ic_solicitudes, rutaActual == Routes.USUARIOS) {
+                    onNavegar(Routes.USUARIOS)
+                }
+            } else if (cargo == Constantes.CARGO_TI) {
                 ItemBarra("Gestión", R.drawable.ic_solicitudes, rutaActual == Routes.GESTION) {
                     onNavegar(Routes.GESTION)
                 }

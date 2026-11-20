@@ -53,8 +53,9 @@ fun LoginScreen(
     val context = LocalContext.current
     val state = viewModel.uiState
 
+    // Si quedó una sesión guardada, entra sin pedir el login otra vez
     LaunchedEffect(Unit) {
-        viewModel.cargarDatosIniciales(context)
+        viewModel.restaurarSesion(context, onLoginSuccess)
     }
 
     // Temblor del formulario cuando hay errores
@@ -68,6 +69,11 @@ fun LoginScreen(
     }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        // Mientras se revisa la sesión guardada solo se muestra el fondo
+        if (state.restaurando) {
+            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+            return@Scaffold
+        }
         Box(modifier = Modifier.fillMaxSize()) {
             // Fondo con la fachada de la escuela y una capa oscura para que se lea el texto
             Image(
@@ -150,10 +156,11 @@ fun LoginScreen(
 
                         Button(
                             onClick = { viewModel.onLoginClick(context, onLoginSuccess) },
+                            enabled = !state.cargando,
                             colors = coloresBotonAccion(),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Iniciar sesión")
+                            Text(if (state.cargando) "Ingresando..." else "Iniciar sesión")
                         }
                     }
                 }

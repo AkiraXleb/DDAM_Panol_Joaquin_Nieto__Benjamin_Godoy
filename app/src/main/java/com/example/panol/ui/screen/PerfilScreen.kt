@@ -114,7 +114,7 @@ fun PerfilScreen(
             confirmButton = {
                 Button(onClick = {
                     mostrarDialogo = false
-                    viewModel.onCerrarSesionConfirmado(onCerrarSesion)
+                    viewModel.onCerrarSesionConfirmado(context, onCerrarSesion)
                 }) {
                     Text("Cerrar sesión")
                 }
@@ -143,7 +143,7 @@ private fun DatoPerfil(titulo: String, valor: String) {
 @Composable
 private fun AvatarPerfil(nombre: String, correo: String) {
     val foto = when (correo) {
-        "profesora.patricia@escuelamarcelapaz.cl" -> R.drawable.perfil_docente
+        "prof.patricia@escuelamarcelapaz.cl" -> R.drawable.perfil_docente
         "ti.roberto@escuelamarcelapaz.cl" -> R.drawable.perfil_ti
         else -> null
     }
