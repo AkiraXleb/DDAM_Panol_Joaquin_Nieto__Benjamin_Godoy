@@ -10,14 +10,17 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
-// Endpoints de img-service: una imagen por equipo (el id es el del equipo)
+/*
+ * Endpoints de img-service: una imagen por equipo (el id es el del equipo).
+ *
+ * - obtener: Response para poder distinguir el 404 (equipo sin imagen) de un error de red.
+ */
 interface ImagenApi {
 
     @Multipart
     @PUT("api/imagenes/equipos/{id}")
     suspend fun subir(@Path("id") id: Long, @Part archivo: MultipartBody.Part)
 
-    // Response para poder distinguir el 404 (equipo sin imagen) de un error de red
     @GET("api/imagenes/equipos/{id}")
     suspend fun obtener(@Path("id") id: Long): Response<ResponseBody>
 

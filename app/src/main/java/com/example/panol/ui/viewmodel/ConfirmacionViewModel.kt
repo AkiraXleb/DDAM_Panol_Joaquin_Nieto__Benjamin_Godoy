@@ -12,13 +12,16 @@ import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.ConfirmacionModel
 import kotlinx.coroutines.launch
 
-// ViewModel de la Confirmación: lee la solicitud recién creada desde el microservicio
+/*
+ * ViewModel de la Confirmación: lee la solicitud recién creada desde el microservicio.
+ *
+ * - cargarSolicitud: Lee la solicitud, sus equipos y el usuario de la sesión.
+ */
 class ConfirmacionViewModel : ViewModel() {
 
     var uiState by mutableStateOf(ConfirmacionModel())
         private set
 
-    // Lee la solicitud, sus equipos y el usuario de la sesión
     fun cargarSolicitud(context: Context) {
         viewModelScope.launch {
             try {

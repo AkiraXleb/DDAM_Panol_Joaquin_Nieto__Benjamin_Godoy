@@ -14,13 +14,19 @@ import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.DetalleModel
 import kotlinx.coroutines.launch
 
-// ViewModel del Detalle: cantidad y agregar al carrito
+/*
+ * ViewModel del Detalle: cantidad y agregar al carrito.
+ *
+ * - cargarEquipo: Lee el equipo elegido en el Catálogo desde el microservicio.
+ * - onMenosClick: Resta 1 a la cantidad, con mínimo 1.
+ * - onMasClick: Suma 1 a la cantidad sin pasar el máximo.
+ * - onAgregarClick: Valida la cantidad y la agrega al carrito.
+ */
 class DetalleViewModel : ViewModel() {
 
     var uiState by mutableStateOf(DetalleModel())
         private set
 
-    // Lee el equipo elegido en el Catálogo desde el microservicio
     fun cargarEquipo(context: Context) {
         viewModelScope.launch {
             try {
@@ -31,7 +37,6 @@ class DetalleViewModel : ViewModel() {
         }
     }
 
-    // Resta 1 a la cantidad, con mínimo 1
     fun onMenosClick() {
         if (uiState.cantidad > 1) {
             uiState = uiState.copy(cantidad = uiState.cantidad - 1, errorCantidad = "")
@@ -40,7 +45,6 @@ class DetalleViewModel : ViewModel() {
         }
     }
 
-    // Suma 1 a la cantidad sin pasar el máximo
     fun onMasClick() {
         if (uiState.cantidad < uiState.maximo) {
             uiState = uiState.copy(cantidad = uiState.cantidad + 1, errorCantidad = "")
@@ -49,7 +53,6 @@ class DetalleViewModel : ViewModel() {
         }
     }
 
-    // Valida la cantidad y la agrega al carrito
     fun onAgregarClick(context: Context, onSuccess: () -> Unit) {
         val equipo = uiState.equipo ?: return
         val maximo = uiState.maximo

@@ -42,6 +42,12 @@ object PanolRepository {
     private val usuarioApi get() = RetrofitClient.usuarioApi
 
     // ---------- Equipos (equipos-service) ----------
+    /*
+     * - crearEquipo: Agrega un equipo al inventario. El servidor lo deja Disponible con todo su stock.
+     * - ajustarMantenimiento: Envía unidades a mantenimiento (cantidad positiva) o las devuelve al stock
+     *   (negativa).
+     * - eliminarEquipo: Quita un equipo del inventario (el servidor no deja si hay unidades prestadas).
+     */
 
     suspend fun equipos(): List<EquipoEntity> {
         return equipoApi.listar().map { it.aEntidad() }
@@ -51,7 +57,6 @@ object PanolRepository {
         return equipoApi.obtener(id.toLong()).aEntidad()
     }
 
-    // Agrega un equipo al inventario. El servidor lo deja Disponible con todo su stock
     suspend fun crearEquipo(
         codigo: String,
         nombre: String,
@@ -75,19 +80,21 @@ object PanolRepository {
         return equipoApi.crear(dto).aEntidad()
     }
 
-    // Envía unidades a mantenimiento (cantidad positiva) o las devuelve al stock (negativa)
     suspend fun ajustarMantenimiento(id: Int, cantidad: Int): EquipoEntity {
         return equipoApi.mantenimiento(id.toLong(), AjusteDto(cantidad)).aEntidad()
     }
 
-    // Quita un equipo del inventario (el servidor no deja si hay unidades prestadas)
     suspend fun eliminarEquipo(id: Int) {
         equipoApi.eliminar(id.toLong())
     }
 
     // ---------- Imágenes de equipos (img-service) ----------
+    /*
+     * - imagenEquipo: Descarga la imagen de un equipo. Devuelve null si el equipo no tiene imagen.
+     * - subirImagenEquipo: Sube (o reemplaza) la imagen de un equipo.
+     * - eliminarImagenEquipo: Borra la imagen de un equipo.
+     */
 
-    // Descarga la imagen de un equipo. Devuelve null si el equipo no tiene imagen
     suspend fun imagenEquipo(id: Int): ByteArray? {
         val respuesta = imagenApi.obtener(id.toLong())
         return when {
@@ -97,21 +104,25 @@ object PanolRepository {
         }
     }
 
-    // Sube (o reemplaza) la imagen de un equipo
     suspend fun subirImagenEquipo(id: Int, archivo: File) {
         val cuerpo = archivo.asRequestBody("image/jpeg".toMediaType())
         val parte = MultipartBody.Part.createFormData("archivo", "equipo_$id.jpg", cuerpo)
         imagenApi.subir(id.toLong(), parte)
     }
 
-    // Borra la imagen de un equipo
     suspend fun eliminarImagenEquipo(id: Int) {
         imagenApi.eliminar(id.toLong())
     }
 
     // ---------- Solicitudes (solicitudes-service) ----------
+    /*
+     * - crearSolicitud: Crea la solicitud en el servidor y devuelve su id.
+     * - solicitudesDe: Solicitudes de un docente.
+     * - todasLasSolicitudes: Todas las solicitudes (Encargado TI).
+     * - cambiarEstado: Cambia el estado. El servidor valida el flujo, el motivo y mueve el stock.
+     * - sinNotificar: Solicitudes aceptadas o rechazadas que aún no se le avisan al docente.
+     */
 
-    // Crea la solicitud en el servidor y devuelve su id
     suspend fun crearSolicitud(
         solicitud: SolicitudEntity,
         usuarioNombre: String,
@@ -137,12 +148,10 @@ object PanolRepository {
         return (solicitudApi.crear(dto).id ?: 0L).toInt()
     }
 
-    // Solicitudes de un docente
     suspend fun solicitudesDe(usuarioId: Int): List<SolicitudConDetalles> {
         return solicitudApi.listar(usuarioId.toLong(), null).map { it.aSolicitudConDetalles() }
     }
 
-    // Todas las solicitudes (Encargado TI)
     suspend fun todasLasSolicitudes(): List<SolicitudConDetalles> {
         return solicitudApi.listar(null, null).map { it.aSolicitudConDetalles() }
     }
@@ -151,7 +160,6 @@ object PanolRepository {
         return solicitudApi.obtener(id.toLong()).aSolicitudConDetalles()
     }
 
-    // Cambia el estado. El servidor valida el flujo, el motivo y mueve el stock.
     suspend fun cambiarEstado(id: Int, estado: String, motivo: String? = null): SolicitudConDetalles {
         return solicitudApi.cambiarEstado(id.toLong(), CambioEstadoDto(estado, motivo))
             .aSolicitudConDetalles()
@@ -161,7 +169,6 @@ object PanolRepository {
         cambiarEstado(id, EstadoSolicitud.CANCELADA)
     }
 
-    // Solicitudes aceptadas o rechazadas que aún no se le avisan al docente
     suspend fun sinNotificar(usuarioId: Int): List<SolicitudEntity> {
         return solicitudesDe(usuarioId)
             .map { it.solicitud }
@@ -176,18 +183,20 @@ object PanolRepository {
     }
 
     // ---------- Usuarios (usuarios-service) ----------
+    /*
+     * - login: Inicia sesión en el servidor. Si los datos son incorrectos lanza HttpException 401.
+     * - usuarios: Todos los usuarios registrados (Super Admin).
+     * - crearUsuario: Crea un usuario. El servidor valida el correo y define el cargo por su prefijo.
+     */
 
-    // Inicia sesión en el servidor. Si los datos son incorrectos lanza HttpException 401
     suspend fun login(email: String, password: String): UsuarioEntity {
         return usuarioApi.login(LoginDto(email, password)).aEntidad()
     }
 
-    // Todos los usuarios registrados (Super Admin)
     suspend fun usuarios(): List<UsuarioEntity> {
         return usuarioApi.listar().map { it.aEntidad() }
     }
 
-    // Crea un usuario. El servidor valida el correo y define el cargo por su prefijo
     suspend fun crearUsuario(nombre: String, email: String, password: String, departamento: String): UsuarioEntity {
         return usuarioApi.crear(NuevoUsuarioDto(nombre, email, password, departamento)).aEntidad()
     }
@@ -197,8 +206,10 @@ object PanolRepository {
     }
 
     // ---------- Mensajes de error ----------
+    /*
+     * - mensajeDeError: Convierte un error de red o del servidor en un texto para el usuario.
+     */
 
-    // Convierte un error de red o del servidor en un texto para el usuario
     fun mensajeDeError(e: Throwable): String {
         return when (e) {
             is HttpException -> {
@@ -217,6 +228,9 @@ object PanolRepository {
     }
 
     // ---------- Conversión de modelos de red a entidades de las pantallas ----------
+    /*
+     * - aEntidad: La contraseña nunca llega a la app, por eso queda vacía.
+     */
 
     private fun EquipoDto.aEntidad() = EquipoEntity(
         id = id.toInt(),
@@ -233,7 +247,6 @@ object PanolRepository {
         ubicacion = ubicacion ?: ""
     )
 
-    // La contraseña nunca llega a la app, por eso queda vacía
     private fun UsuarioDto.aEntidad() = UsuarioEntity(
         id = id.toInt(),
         nombre = nombre ?: "",

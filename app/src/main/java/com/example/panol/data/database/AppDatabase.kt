@@ -27,15 +27,17 @@ import com.example.panol.data.local.entity.UsuarioEntity
     version = 3,
     exportSchema = false
 )
+/*
+ * - usuarioDao: DAO de usuarios.
+ * - equipoDao: DAO de equipos.
+ * - carritoDao: DAO del carrito.
+ * - solicitudDao: DAO de solicitudes.
+ */
 abstract class AppDatabase : RoomDatabase() {
 
-    // DAO de usuarios
     abstract fun usuarioDao(): UsuarioDao
-    // DAO de equipos
     abstract fun equipoDao(): EquipoDao
-    // DAO del carrito
     abstract fun carritoDao(): CarritoDao
-    // DAO de solicitudes
     abstract fun solicitudDao(): SolicitudDao
 
     // Singleton: una sola instancia de la base de datos

@@ -14,13 +14,22 @@ import com.example.panol.ui.model.UsuariosModel
 import com.example.panol.ui.screen.vibrar
 import kotlinx.coroutines.launch
 
-// ViewModel de Usuarios (Super Admin): lista, agrega y elimina usuarios en el servidor
+/*
+ * ViewModel de Usuarios (Super Admin): lista, agrega y elimina usuarios en el servidor.
+ *
+ * - cargar: Lee todos los usuarios del microservicio.
+ * - onNuevoClick: Abre el formulario con los campos vacíos.
+ * - onCancelarNuevo: Cierra el formulario.
+ * - validar: Valida cada campo y devuelve true si no hay errores.
+ * - onGuardarClick: Valida y crea el usuario. El cargo lo define el servidor según el prefijo del
+ *   correo.
+ * - onEliminarClick: Elimina un usuario y recarga la lista.
+ */
 class UsuariosViewModel : ViewModel() {
 
     var uiState by mutableStateOf(UsuariosModel())
         private set
 
-    // Lee todos los usuarios del microservicio
     fun cargar(context: Context) {
         viewModelScope.launch {
             uiState = uiState.copy(cargando = true)
@@ -33,7 +42,6 @@ class UsuariosViewModel : ViewModel() {
         }
     }
 
-    // Abre el formulario con los campos vacíos
     fun onNuevoClick() {
         uiState = uiState.copy(
             mostrarFormulario = true,
@@ -42,7 +50,6 @@ class UsuariosViewModel : ViewModel() {
         )
     }
 
-    // Cierra el formulario
     fun onCancelarNuevo() {
         uiState = uiState.copy(mostrarFormulario = false)
     }
@@ -63,7 +70,6 @@ class UsuariosViewModel : ViewModel() {
         uiState = uiState.copy(departamento = valor, errorDepartamento = "", errorGeneral = "")
     }
 
-    // Valida cada campo y devuelve true si no hay errores
     private fun validar(): Boolean {
         val state = uiState
         val correo = state.correo.trim().lowercase()
@@ -89,7 +95,6 @@ class UsuariosViewModel : ViewModel() {
             errorPassword.isEmpty() && errorDepartamento.isEmpty()
     }
 
-    // Valida y crea el usuario. El cargo lo define el servidor según el prefijo del correo
     fun onGuardarClick(context: Context) {
         if (!validar()) return
         val state = uiState
@@ -111,7 +116,6 @@ class UsuariosViewModel : ViewModel() {
         }
     }
 
-    // Elimina un usuario y recarga la lista
     fun onEliminarClick(context: Context, usuario: UsuarioEntity) {
         viewModelScope.launch {
             try {
