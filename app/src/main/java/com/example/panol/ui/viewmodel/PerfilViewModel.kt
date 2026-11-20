@@ -63,7 +63,7 @@ class PerfilViewModel : ViewModel() {
         }
     }
 
-    // Borra la foto y vuelve a la imagen por defecto
+    // Borra la foto y vuelve al círculo con las iniciales
     fun onQuitarFoto(context: Context) {
         val usuario = Sesion.usuario ?: return
         archivoFoto(context, usuario.id).delete()

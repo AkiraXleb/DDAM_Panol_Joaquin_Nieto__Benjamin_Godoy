@@ -7,8 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.graphics.asImageBitmap
-import com.example.panol.R
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
@@ -98,7 +96,7 @@ fun PerfilScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    AvatarPerfil(nombre = state.nombre, correo = state.correo, fotoVersion = state.fotoVersion)
+                    AvatarPerfil(nombre = state.nombre, fotoVersion = state.fotoVersion)
                     TextButton(onClick = { mostrarOpcionesFoto = true }) {
                         Text("Cambiar foto")
                     }
@@ -198,9 +196,9 @@ private fun DatoPerfil(titulo: String, valor: String) {
     }
 }
 
-// Foto del usuario: la que eligió, si no la de su correo y si no, un círculo con sus iniciales
+// Foto del usuario: la que eligió o, si no tiene, un círculo con sus iniciales
 @Composable
-private fun AvatarPerfil(nombre: String, correo: String, fotoVersion: Int) {
+private fun AvatarPerfil(nombre: String, fotoVersion: Int) {
     val context = LocalContext.current
     val usuarioId = Sesion.usuario?.id ?: 0
     // Se vuelve a leer el archivo cada vez que cambia fotoVersion
@@ -219,37 +217,21 @@ private fun AvatarPerfil(nombre: String, correo: String, fotoVersion: Int) {
         )
         return
     }
-    val foto = when (correo) {
-        "prof.patricia@escuelamarcelapaz.cl" -> R.drawable.perfil_docente
-        "ti.roberto@escuelamarcelapaz.cl" -> R.drawable.perfil_ti
-        else -> null
-    }
-    if (foto != null) {
-        Image(
-            painter = painterResource(foto),
-            contentDescription = "Foto de perfil",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
+    val iniciales = nombre.split(" ")
+        .filter { it.isNotBlank() }
+        .take(2)
+        .joinToString("") { it.first().uppercase() }
+    Box(
+        modifier = Modifier
+            .size(120.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = iniciales,
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onPrimary
         )
-    } else {
-        val iniciales = nombre.split(" ")
-            .filter { it.isNotBlank() }
-            .take(2)
-            .joinToString("") { it.first().uppercase() }
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = iniciales,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
     }
 }
