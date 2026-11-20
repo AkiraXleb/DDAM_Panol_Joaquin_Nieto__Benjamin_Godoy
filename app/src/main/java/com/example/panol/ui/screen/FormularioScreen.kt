@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -44,6 +45,8 @@ import com.example.panol.ui.components.Header
 import com.example.panol.ui.components.MensajeError
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.SolicitudViewModel
+import java.util.Calendar
+import java.util.TimeZone
 
 // Pantalla del formulario de solicitud con validación por campo
 @Composable
@@ -283,8 +286,21 @@ private fun DialogoFecha(
     onConfirmar: (Long) -> Unit,
     onCancelar: () -> Unit
 ) {
+    // Hoy a las 00:00 en UTC (el calendario entrega las fechas en UTC)
+    val hoy = Calendar.getInstance()
+    val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    utc.clear()
+    utc.set(hoy.get(Calendar.YEAR), hoy.get(Calendar.MONTH), hoy.get(Calendar.DAY_OF_MONTH))
+    val inicioHoyUtc = utc.timeInMillis
+
     val pickerState = rememberDatePickerState(
-        initialSelectedDateMillis = if (fechaInicial == 0L) null else fechaInicial
+        initialSelectedDateMillis = if (fechaInicial == 0L) null else fechaInicial,
+        // Solo se pueden elegir fechas desde hoy: los días anteriores aparecen deshabilitados
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= inicioHoyUtc
+            }
+        }
     )
     DatePickerDialog(
         onDismissRequest = onCancelar,

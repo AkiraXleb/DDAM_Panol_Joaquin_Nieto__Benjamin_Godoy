@@ -1,7 +1,11 @@
 package com.example.panol.ui.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,9 +21,11 @@ import com.example.panol.ui.screen.ConfirmacionScreen
 import com.example.panol.ui.screen.DetalleScreen
 import com.example.panol.ui.screen.FormularioScreen
 import com.example.panol.ui.screen.GestionScreen
+import com.example.panol.ui.screen.InventarioScreen
 import com.example.panol.ui.screen.LoginScreen
 import com.example.panol.ui.screen.MisSolicitudesScreen
 import com.example.panol.ui.screen.PerfilScreen
+import com.example.panol.ui.screen.UsuariosScreen
 
 // Nombres de las rutas de navegación
 object Routes {
@@ -32,11 +38,17 @@ object Routes {
     const val CONFIRMACION = "confirmacion"
     const val PERFIL = "perfil"
     const val GESTION = "gestion"
+    const val USUARIOS = "usuarios"
+    const val INVENTARIO = "inventario"
 }
 
-// Pantalla de inicio según el rol: el Encargado TI gestiona, el resto solicita
+// Pantalla de inicio según el rol: el Super Admin administra usuarios, el Encargado TI gestiona, el resto solicita
 private fun rutaInicio(): String {
-    return if (Sesion.usuario?.cargo == Constantes.CARGO_TI) Routes.GESTION else Routes.CATALOGO
+    return when (Sesion.usuario?.cargo) {
+        Constantes.CARGO_SUPER_ADMIN -> Routes.USUARIOS
+        Constantes.CARGO_TI -> Routes.GESTION
+        else -> Routes.CATALOGO
+    }
 }
 
 // Define las rutas de la app y cómo se navega entre pantallas
@@ -56,55 +68,67 @@ fun AppNavigation() {
         }
     }
 
-    NavHost(navController = navController, startDestination = Routes.LOGIN) {
-        composable(Routes.LOGIN) {
-            LoginScreen(onLoginSuccess = {
-                navController.navigate(rutaInicio()) {
-                    popUpTo(Routes.LOGIN) { inclusive = true }
-                }
-            })
-        }
-        composable(Routes.CATALOGO) {
-            CatalogoScreen(
-                onVerDetalle = { navController.navigate(Routes.DETALLE) },
-                onNavegar = navegar
-            )
-        }
-        composable(Routes.DETALLE) {
-            DetalleScreen(
-                onVolver = { navController.popBackStack() },
-                onAgregado = { navController.popBackStack() }
-            )
-        }
-        composable(Routes.CARRITO) {
-            CarritoScreen(
-                onContinuar = { navController.navigate(Routes.FORMULARIO) },
-                onNavegar = navegar
-            )
-        }
-        composable(Routes.FORMULARIO) {
-            FormularioScreen(
-                onVolver = { navController.popBackStack() },
-                onEnviado = {
-                    navController.navigate(Routes.CONFIRMACION) {
-                        popUpTo(Routes.CARRITO) { inclusive = true }
+    // Fondo fijo y sin animaciones entre pantallas: evita el destello blanco al cambiar de pestaña
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        NavHost(
+            navController = navController,
+            startDestination = Routes.LOGIN,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None }
+        ) {
+            composable(Routes.LOGIN) {
+                LoginScreen(onLoginSuccess = {
+                    navController.navigate(rutaInicio()) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
                     }
-                }
-            )
-        }
-        composable(Routes.CONFIRMACION) { ConfirmacionScreen(onNavegar = navegar) }
-        composable(Routes.GESTION) { GestionScreen(onNavegar = navegar) }
-        composable(Routes.MIS_SOLICITUDES) { MisSolicitudesScreen(onNavegar = navegar) }
-        composable(Routes.PERFIL) {
-            PerfilScreen(
-                onNavegar = navegar,
-                onCerrarSesion = {
-                    // Limpia toda la pila, sin importar el rol que estaba conectado
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(navController.graph.id) { inclusive = true }
+                })
+            }
+            composable(Routes.CATALOGO) {
+                CatalogoScreen(
+                    onVerDetalle = { navController.navigate(Routes.DETALLE) },
+                    onNavegar = navegar
+                )
+            }
+            composable(Routes.DETALLE) {
+                DetalleScreen(
+                    onVolver = { navController.popBackStack() },
+                    onAgregado = { navController.popBackStack() }
+                )
+            }
+            composable(Routes.CARRITO) {
+                CarritoScreen(
+                    onContinuar = { navController.navigate(Routes.FORMULARIO) },
+                    onNavegar = navegar
+                )
+            }
+            composable(Routes.FORMULARIO) {
+                FormularioScreen(
+                    onVolver = { navController.popBackStack() },
+                    onEnviado = {
+                        navController.navigate(Routes.CONFIRMACION) {
+                            popUpTo(Routes.CARRITO) { inclusive = true }
+                        }
                     }
-                }
-            )
+                )
+            }
+            composable(Routes.CONFIRMACION) { ConfirmacionScreen(onNavegar = navegar) }
+            composable(Routes.GESTION) { GestionScreen(onNavegar = navegar) }
+            composable(Routes.USUARIOS) { UsuariosScreen(onNavegar = navegar) }
+            composable(Routes.INVENTARIO) { InventarioScreen(onNavegar = navegar) }
+            composable(Routes.MIS_SOLICITUDES) { MisSolicitudesScreen(onNavegar = navegar) }
+            composable(Routes.PERFIL) {
+                PerfilScreen(
+                    onNavegar = navegar,
+                    onCerrarSesion = {
+                        // Limpia toda la pila, sin importar el rol que estaba conectado
+                        navController.navigate(Routes.LOGIN) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        }
+                    }
+                )
+            }
         }
     }
 }

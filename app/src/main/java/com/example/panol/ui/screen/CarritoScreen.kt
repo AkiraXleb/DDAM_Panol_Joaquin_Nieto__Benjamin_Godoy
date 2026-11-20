@@ -35,7 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.panol.data.local.entity.CarritoItemEntity
 import com.example.panol.ui.components.BarraInferior
 import com.example.panol.ui.components.Header
-import com.example.panol.ui.components.iconoCategoria
+import com.example.panol.ui.components.ImagenEquipo
 import com.example.panol.ui.navigation.Routes
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.CarritoViewModel
@@ -167,11 +167,10 @@ private fun TarjetaCarrito(
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(iconoCategoria(item.categoria)),
-                    contentDescription = item.categoria,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
+                ImagenEquipo(
+                    equipoId = item.equipoId,
+                    categoria = item.categoria,
+                    modifier = Modifier.size(56.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {

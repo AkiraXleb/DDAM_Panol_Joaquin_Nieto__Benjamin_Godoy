@@ -31,4 +31,22 @@ object RetrofitClient {
     val solicitudApi: SolicitudApi by lazy {
         crearRetrofit(ApiConfig.SOLICITUDES_URL).create(SolicitudApi::class.java)
     }
+
+    // Las imágenes usan un cliente sin log del cuerpo (si no, el Logcat se llena de bytes)
+    private val clienteImagenes = OkHttpClient.Builder()
+        .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC })
+        .build()
+
+    val imagenApi: ImagenApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(ApiConfig.IMAGENES_URL)
+            .client(clienteImagenes)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ImagenApi::class.java)
+    }
+
+    val usuarioApi: UsuarioApi by lazy {
+        crearRetrofit(ApiConfig.USUARIOS_URL).create(UsuarioApi::class.java)
+    }
 }

@@ -23,7 +23,8 @@ import com.example.panol.data.local.entity.UsuarioEntity
         SolicitudEntity::class,
         DetalleSolicitudEntity::class
     ],
-    version = 1,
+    // Versión 2: la tabla usuarios pasó a guardar solo la sesión (se recrea la base al actualizar)
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -49,7 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "panol_database.db"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }
