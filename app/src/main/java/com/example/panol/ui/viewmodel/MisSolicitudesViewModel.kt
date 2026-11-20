@@ -15,13 +15,21 @@ import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.MisSolicitudesModel
 import kotlinx.coroutines.launch
 
-// ViewModel de Mis Solicitudes: filtro, cancelación y avisos
+/*
+ * ViewModel de Mis Solicitudes: filtro, cancelación y avisos.
+ *
+ * - cargarSolicitudes: Lee las solicitudes del docente desde el microservicio y el carrito desde Room.
+ * - obtenerYMarcarNotificadas: Busca las solicitudes sin avisar, las marca como notificadas en el
+ *   servidor y las devuelve.
+ * - onTodasClick: Quita el filtro de estado.
+ * - onEstadoClick: Filtra por estado, o quita el filtro si ya estaba elegido.
+ * - onCancelarConfirmado: Cambia una solicitud pendiente a Cancelada.
+ */
 class MisSolicitudesViewModel : ViewModel() {
 
     var uiState by mutableStateOf(MisSolicitudesModel())
         private set
 
-    // Lee las solicitudes del docente desde el microservicio y el carrito desde Room
     fun cargarSolicitudes(context: Context) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
@@ -41,7 +49,6 @@ class MisSolicitudesViewModel : ViewModel() {
         }
     }
 
-    // Busca las solicitudes sin avisar, las marca como notificadas en el servidor y las devuelve
     suspend fun obtenerYMarcarNotificadas(context: Context): List<SolicitudEntity> {
         val usuarioId = Sesion.usuario?.id ?: return emptyList()
         return try {
@@ -53,18 +60,15 @@ class MisSolicitudesViewModel : ViewModel() {
         }
     }
 
-    // Quita el filtro de estado
     fun onTodasClick() {
         uiState = uiState.copy(estadoSeleccionado = "")
     }
 
-    // Filtra por estado, o quita el filtro si ya estaba elegido
     fun onEstadoClick(estado: String) {
         val nuevo = if (uiState.estadoSeleccionado == estado) "" else estado
         uiState = uiState.copy(estadoSeleccionado = nuevo)
     }
 
-    // Cambia una solicitud pendiente a Cancelada
     fun onCancelarConfirmado(context: Context, solicitud: SolicitudEntity) {
         if (solicitud.estado != EstadoSolicitud.PENDIENTE) return
         viewModelScope.launch {

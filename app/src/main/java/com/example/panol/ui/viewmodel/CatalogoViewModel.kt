@@ -16,14 +16,21 @@ import com.example.panol.data.repository.PanolRepository
 import com.example.panol.ui.model.CatalogoModel
 import kotlinx.coroutines.launch
 
-// ViewModel del Catálogo: búsqueda, filtros y agregar al carrito
+/*
+ * ViewModel del Catálogo: búsqueda, filtros y agregar al carrito.
+ *
+ * - cargarDatos: Lee los equipos desde el microservicio y el contador del carrito desde Room manual =
+ *   true cuando el usuario arrastra hacia abajo para recargar.
+ * - onBusquedaChanged: Actualiza el texto del buscador.
+ * - onTodosClick: Quita el filtro de categoría.
+ * - onCategoriaClick: Filtra por categoría, o quita el filtro si ya estaba elegida.
+ * - onAgregarClick: Agrega 1 unidad al carrito respetando el máximo.
+ */
 class CatalogoViewModel : ViewModel() {
 
     var uiState by mutableStateOf(CatalogoModel())
         private set
 
-    // Lee los equipos desde el microservicio y el contador del carrito desde Room
-    // manual = true cuando el usuario arrastra hacia abajo para recargar
     fun cargarDatos(context: Context, manual: Boolean = false) {
         viewModelScope.launch {
             uiState = uiState.copy(cargando = true)
@@ -47,23 +54,19 @@ class CatalogoViewModel : ViewModel() {
         }
     }
 
-    // Actualiza el texto del buscador
     fun onBusquedaChanged(valor: String) {
         uiState = uiState.copy(busqueda = valor)
     }
 
-    // Quita el filtro de categoría
     fun onTodosClick() {
         uiState = uiState.copy(categoriaSeleccionada = "")
     }
 
-    // Filtra por categoría, o quita el filtro si ya estaba elegida
     fun onCategoriaClick(categoria: String) {
         val nueva = if (uiState.categoriaSeleccionada == categoria) "" else categoria
         uiState = uiState.copy(categoriaSeleccionada = nueva)
     }
 
-    // Agrega 1 unidad al carrito respetando el máximo
     fun onAgregarClick(context: Context, equipo: EquipoEntity) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)

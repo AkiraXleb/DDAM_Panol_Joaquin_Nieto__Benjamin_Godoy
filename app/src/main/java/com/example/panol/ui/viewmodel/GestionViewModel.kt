@@ -15,13 +15,24 @@ import com.example.panol.ui.screen.sonarAprobacion
 import com.example.panol.ui.screen.vibrar
 import kotlinx.coroutines.launch
 
-// ViewModel de Gestión (Encargado TI): aceptar, rechazar con motivo, entregar y recibir
+/*
+ * ViewModel de Gestión (Encargado TI): aceptar, rechazar con motivo, entregar y recibir.
+ *
+ * - cargar: Lee todas las solicitudes del microservicio. Si hay pendientes, avisa con vibración.
+ * - onTodasClick: Quita el filtro de estado.
+ * - onEstadoClick: Filtra por estado, o quita el filtro si ya estaba elegido.
+ * - onMotivoChanged: Limpia el error del motivo mientras el encargado escribe.
+ * - onAceptarClick: Acepta la solicitud (el servidor descuenta el stock).
+ * - onRechazarClick: Valida el motivo y rechaza la solicitud.
+ * - onEntregarClick: Registra la entrega de los equipos.
+ * - onRecibirClick: Registra la devolución (el servidor repone el stock).
+ * - cambiar: Envía el cambio de estado al servidor, vibra y recarga la lista.
+ */
 class GestionViewModel : ViewModel() {
 
     var uiState by mutableStateOf(GestionModel())
         private set
 
-    // Lee todas las solicitudes del microservicio. Si hay pendientes, avisa con vibración.
     fun cargar(context: Context, avisarPendientes: Boolean) {
         viewModelScope.launch {
             uiState = uiState.copy(cargando = true)
@@ -45,28 +56,23 @@ class GestionViewModel : ViewModel() {
         }
     }
 
-    // Quita el filtro de estado
     fun onTodasClick() {
         uiState = uiState.copy(estadoSeleccionado = "")
     }
 
-    // Filtra por estado, o quita el filtro si ya estaba elegido
     fun onEstadoClick(estado: String) {
         val nuevo = if (uiState.estadoSeleccionado == estado) "" else estado
         uiState = uiState.copy(estadoSeleccionado = nuevo)
     }
 
-    // Limpia el error del motivo mientras el encargado escribe
     fun onMotivoChanged() {
         uiState = uiState.copy(errorMotivo = "")
     }
 
-    // Acepta la solicitud (el servidor descuenta el stock)
     fun onAceptarClick(context: Context, solicitud: SolicitudEntity) {
         cambiar(context, solicitud.id, EstadoSolicitud.ACEPTADA, null, "SOL-${solicitud.id} aceptada")
     }
 
-    // Valida el motivo y rechaza la solicitud
     fun onRechazarClick(context: Context, solicitud: SolicitudEntity, motivo: String, onSuccess: () -> Unit) {
         val texto = motivo.trim()
         val error = when {
@@ -79,17 +85,14 @@ class GestionViewModel : ViewModel() {
         cambiar(context, solicitud.id, EstadoSolicitud.RECHAZADA, texto, "SOL-${solicitud.id} rechazada", onSuccess)
     }
 
-    // Registra la entrega de los equipos
     fun onEntregarClick(context: Context, solicitud: SolicitudEntity) {
         cambiar(context, solicitud.id, EstadoSolicitud.ENTREGADA, null, "SOL-${solicitud.id} entregada")
     }
 
-    // Registra la devolución (el servidor repone el stock)
     fun onRecibirClick(context: Context, solicitud: SolicitudEntity) {
         cambiar(context, solicitud.id, EstadoSolicitud.DEVUELTA, null, "SOL-${solicitud.id} recibida")
     }
 
-    // Envía el cambio de estado al servidor, vibra y recarga la lista
     private fun cambiar(
         context: Context,
         id: Int,

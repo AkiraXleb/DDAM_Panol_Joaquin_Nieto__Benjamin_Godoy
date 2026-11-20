@@ -1,6 +1,5 @@
 package com.example.panol.data
 
-
 // Estados posibles de un equipo del inventario
 object EstadoEquipo {
     const val DISPONIBLE = "Disponible"
@@ -20,7 +19,14 @@ object EstadoSolicitud {
     const val CANCELADA = "Cancelada"
 }
 
-// Valores fijos del caso: categorías, salas, dominio de correo y reglas del préstamo
+/*
+ * Valores fijos del caso: categorías, salas, dominio de correo y reglas del préstamo.
+ *
+ * - PREFIJOS_CORREO: Prefijos permitidos en el correo: prof. (Docente), insp. (Inspector), ti.
+ *   (Encargado TI), admin. (Super Admin).
+ * - correoValido: Revisa que el correo sea prefijo.nombre@escuelamarcelapaz.cl, con prefijo válido y
+ *   nombre en minúsculas o números.
+ */
 object Constantes {
     val CATEGORIAS = listOf(
         "Notebook", "Computador", "Proyector", "Parlante",
@@ -39,10 +45,8 @@ object Constantes {
     const val CARGO_TI = "Encargado TI"
     const val CARGO_SUPER_ADMIN = "Super Admin"
 
-    // Prefijos permitidos en el correo: prof. (Docente), insp. (Inspector), ti. (Encargado TI), admin. (Super Admin)
     val PREFIJOS_CORREO = listOf("prof", "insp", "ti", "admin")
 
-    // Revisa que el correo sea prefijo.nombre@escuelamarcelapaz.cl, con prefijo válido y nombre en minúsculas o números
     fun correoValido(correo: String): Boolean {
         if (!correo.endsWith(DOMINIO_CORREO)) return false
         val partes = correo.removeSuffix(DOMINIO_CORREO).split(".")
