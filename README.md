@@ -9,13 +9,13 @@ Proyecto de **DSY1105 – Desarrollo de Aplicaciones Móviles** (DuocUC Maipú, 
 
 | Integrante | Aporte principal |
 |---|---|
-| **Joaquín Nieto** | Microservicio `solicitudes-service`, despliegue en AWS, capa Retrofit + `PanolRepository`, ViewModels, Login/Catálogo/Detalle/Perfil, mejoras visuales e ícono |
+| **Joaquín Nieto** | Microservicios `solicitudes-service`, `usuarios-service` e `img-service`, despliegue en AWS, capa Retrofit + `PanolRepository`, ViewModels, Login/Catálogo/Detalle/Perfil, Super Admin (Usuarios), Inventario, mejoras visuales e ícono |
 | **Benjamín Godoy** | Microservicio `equipos-service`, rol Encargado TI (Gestión), Carrito, Formulario, Confirmación, Mis Solicitudes y recursos nativos |
 
 ## Arquitectura
 
 - **App Android**: Kotlin + Jetpack Compose, patrón **MVVM** (Screen → ViewModel → Repository → API / Room).
-- **Backend**: tres microservicios Spring Boot (Java 21) + PostgreSQL con Docker Compose en **AWS EC2** (Elastic IP `32.197.25.36`).
+- **Backend**: cuatro microservicios Spring Boot (Java 21) + PostgreSQL con Docker Compose en **AWS EC2** (Elastic IP `32.197.25.36`).
   - `equipos-service` → `:8081`
   - `solicitudes-service` → `:8082`
   - `usuarios-service` → `:8083` (login y administración de usuarios)
@@ -40,7 +40,7 @@ Kotlin, Jetpack Compose (Material 3), Navigation Compose, Room, Retrofit + OkHtt
 
 **Encargado TI**
 - Consola de Gestión: aceptar/rechazar, marcar entregada y devuelta (con sonido de aprobación).
-- Inventario: agregar equipos nuevos y eliminar los que no tengan unidades en préstamo.
+- Inventario: agregar equipos nuevos (con imagen opcional desde la cámara o la galería), cambiar la imagen de un equipo, enviar unidades a mantenimiento y devolverlas al stock, y eliminar los equipos que no tengan unidades en préstamo ni en mantenimiento.
 
 **Super Admin**
 - Usuarios: agregar y eliminar usuarios con correo `prefijo.nombre@escuelamarcelapaz.cl`.
@@ -78,7 +78,7 @@ El Super Admin agrega y elimina usuarios desde la pantalla *Usuarios*.
 3. URLs del servidor en `data/remote/ApiConfig.kt`.
 4. **El servidor AWS solo responde mientras el AWS Academy Learner Lab esté iniciado.**
 
-APK firmado: pestaña **Releases** (v2.0.0). Pruebas: `./gradlew test`.
+APK firmado: pestaña **Releases** (v2.1.0). Pruebas: `./gradlew test`.
 
 ## Git Flow
 
