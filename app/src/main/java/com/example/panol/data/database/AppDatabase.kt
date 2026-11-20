@@ -24,7 +24,7 @@ import com.example.panol.data.local.entity.UsuarioEntity
         DetalleSolicitudEntity::class
     ],
     // Versión 2: la tabla usuarios pasó a guardar solo la sesión (se recrea la base al actualizar)
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

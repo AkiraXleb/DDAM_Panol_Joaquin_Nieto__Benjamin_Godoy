@@ -12,9 +12,13 @@ data class EquipoDto(
     val descripcion: String? = null,
     val stockTotal: Int? = null,
     val stockDisponible: Int? = null,
+    val stockMantenimiento: Int? = null,
     val estado: String? = null,
     val ubicacion: String? = null
 )
+
+// Cuerpo de PATCH /api/equipos/{id}/mantenimiento: positivo envía a mantenimiento, negativo devuelve al stock
+data class AjusteDto(val cantidad: Int)
 
 data class DetalleDto(
     val id: Long? = null,

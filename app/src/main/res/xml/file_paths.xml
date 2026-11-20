@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Carpeta temporal donde la cámara deja la foto antes de procesarla -->
+    <cache-path name="camara" path="." />
+</paths>

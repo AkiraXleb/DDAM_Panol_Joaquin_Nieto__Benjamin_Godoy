@@ -21,6 +21,7 @@ import com.example.panol.ui.screen.ConfirmacionScreen
 import com.example.panol.ui.screen.DetalleScreen
 import com.example.panol.ui.screen.FormularioScreen
 import com.example.panol.ui.screen.GestionScreen
+import com.example.panol.ui.screen.InventarioScreen
 import com.example.panol.ui.screen.LoginScreen
 import com.example.panol.ui.screen.MisSolicitudesScreen
 import com.example.panol.ui.screen.PerfilScreen
@@ -38,6 +39,7 @@ object Routes {
     const val PERFIL = "perfil"
     const val GESTION = "gestion"
     const val USUARIOS = "usuarios"
+    const val INVENTARIO = "inventario"
 }
 
 // Pantalla de inicio según el rol: el Super Admin administra usuarios, el Encargado TI gestiona, el resto solicita
@@ -114,6 +116,7 @@ fun AppNavigation() {
             composable(Routes.CONFIRMACION) { ConfirmacionScreen(onNavegar = navegar) }
             composable(Routes.GESTION) { GestionScreen(onNavegar = navegar) }
             composable(Routes.USUARIOS) { UsuariosScreen(onNavegar = navegar) }
+            composable(Routes.INVENTARIO) { InventarioScreen(onNavegar = navegar) }
             composable(Routes.MIS_SOLICITUDES) { MisSolicitudesScreen(onNavegar = navegar) }
             composable(Routes.PERFIL) {
                 PerfilScreen(

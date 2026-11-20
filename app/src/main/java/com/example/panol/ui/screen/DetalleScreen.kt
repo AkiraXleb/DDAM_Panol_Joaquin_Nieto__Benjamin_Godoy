@@ -30,7 +30,7 @@ import com.example.panol.data.EstadoEquipo
 import com.example.panol.ui.components.ChipEstado
 import com.example.panol.ui.components.Header
 import com.example.panol.ui.components.MensajeError
-import com.example.panol.ui.components.iconoCategoria
+import com.example.panol.ui.components.ImagenEquipo
 import com.example.panol.ui.theme.coloresBotonAccion
 import com.example.panol.ui.viewmodel.DetalleViewModel
 
@@ -72,11 +72,10 @@ fun DetalleScreen(
                     .padding(top = 16.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(iconoCategoria(equipo.categoria)),
-                                contentDescription = equipo.categoria,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(40.dp)
+                            ImagenEquipo(
+                                equipoId = equipo.id,
+                                categoria = equipo.categoria,
+                                modifier = Modifier.size(88.dp)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {

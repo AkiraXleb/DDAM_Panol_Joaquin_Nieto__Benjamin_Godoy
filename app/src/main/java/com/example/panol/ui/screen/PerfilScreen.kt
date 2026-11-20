@@ -1,6 +1,12 @@
 package com.example.panol.ui.screen
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.graphics.asImageBitmap
 import com.example.panol.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
@@ -34,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.panol.data.Sesion
 import com.example.panol.ui.components.BarraInferior
 import com.example.panol.ui.components.Header
 import com.example.panol.ui.navigation.Routes
@@ -49,6 +56,16 @@ fun PerfilScreen(
     val context = LocalContext.current
     val state = viewModel.uiState
     var mostrarDialogo by remember { mutableStateOf(false) }
+    var mostrarOpcionesFoto by remember { mutableStateOf(false) }
+
+    // Selector de fotos de la galería
+    val galeria = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) viewModel.onFotoElegida(context, uri)
+    }
+    // Cámara: deja la foto en un archivo temporal y avisa si se tomó
+    val camara = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { tomada: Boolean ->
+        if (tomada) viewModel.onFotoTomada(context)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.cargarDatos(context)
@@ -80,7 +97,12 @@ fun PerfilScreen(
                     .padding(top = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                AvatarPerfil(nombre = state.nombre, correo = state.correo)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AvatarPerfil(nombre = state.nombre, correo = state.correo, fotoVersion = state.fotoVersion)
+                    TextButton(onClick = { mostrarOpcionesFoto = true }) {
+                        Text("Cambiar foto")
+                    }
+                }
             }
 
             Card(modifier = Modifier
@@ -103,6 +125,43 @@ fun PerfilScreen(
                 Text("Cerrar sesión")
             }
         }
+    }
+
+    // Opciones para cambiar la foto de perfil
+    if (mostrarOpcionesFoto) {
+        AlertDialog(
+            onDismissRequest = { mostrarOpcionesFoto = false },
+            title = { Text("Foto de perfil") },
+            text = {
+                Column {
+                    TextButton(onClick = {
+                        mostrarOpcionesFoto = false
+                        try {
+                            camara.launch(uriCamara(context))
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No se pudo abrir la cámara", Toast.LENGTH_LONG).show()
+                        }
+                    }) {
+                        Text("Tomar foto")
+                    }
+                    TextButton(onClick = {
+                        mostrarOpcionesFoto = false
+                        galeria.launch("image/*")
+                    }) {
+                        Text("Elegir de la galería")
+                    }
+                    TextButton(onClick = {
+                        mostrarOpcionesFoto = false
+                        viewModel.onQuitarFoto(context)
+                    }) {
+                        Text("Quitar foto")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { mostrarOpcionesFoto = false }) { Text("Cancelar") }
+            }
+        )
     }
 
     // Diálogo para confirmar el cierre de sesión
@@ -139,9 +198,27 @@ private fun DatoPerfil(titulo: String, valor: String) {
     }
 }
 
-// Foto del usuario según su correo; si no tiene, círculo con sus iniciales
+// Foto del usuario: la que eligió, si no la de su correo y si no, un círculo con sus iniciales
 @Composable
-private fun AvatarPerfil(nombre: String, correo: String) {
+private fun AvatarPerfil(nombre: String, correo: String, fotoVersion: Int) {
+    val context = LocalContext.current
+    val usuarioId = Sesion.usuario?.id ?: 0
+    // Se vuelve a leer el archivo cada vez que cambia fotoVersion
+    val propia = remember(fotoVersion, usuarioId) {
+        val archivo = archivoFoto(context, usuarioId)
+        if (archivo.exists()) BitmapFactory.decodeFile(archivo.path)?.asImageBitmap() else null
+    }
+    if (propia != null) {
+        Image(
+            bitmap = propia,
+            contentDescription = "Foto de perfil",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+        )
+        return
+    }
     val foto = when (correo) {
         "prof.patricia@escuelamarcelapaz.cl" -> R.drawable.perfil_docente
         "ti.roberto@escuelamarcelapaz.cl" -> R.drawable.perfil_ti
