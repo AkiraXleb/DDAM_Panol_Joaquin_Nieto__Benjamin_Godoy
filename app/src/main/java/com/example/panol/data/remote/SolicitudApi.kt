@@ -7,10 +7,13 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-// Endpoints del microservicio de solicitudes
+/*
+ * Endpoints del microservicio de solicitudes.
+ *
+ * - listar: Docente: usuarioId con valor. Encargado TI: usuarioId null (trae todas).
+ */
 interface SolicitudApi {
 
-    // Docente: usuarioId con valor. Encargado TI: usuarioId null (trae todas)
     @GET("api/solicitudes")
     suspend fun listar(
         @Query("usuarioId") usuarioId: Long?,

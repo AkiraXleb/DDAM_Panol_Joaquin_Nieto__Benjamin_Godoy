@@ -14,23 +14,28 @@ import com.example.panol.ui.model.LoginModel
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-// ViewModel del Login: validación de campos, login contra el servidor y sesión guardada en Room
+/*
+ * ViewModel del Login: validación de campos, login contra el servidor y sesión guardada en Room.
+ *
+ * - onCorreoChanged: Actualiza el correo y limpia sus errores.
+ * - onPasswordChanged: Actualiza la contraseña y limpia sus errores.
+ * - restaurarSesion: Si quedó una sesión guardada en Room entra directo; si no, muestra el formulario.
+ * - validar: Valida cada campo y devuelve true si no hay errores.
+ * - onLoginClick: Valida, inicia sesión en el servidor y guarda la sesión en Room.
+ */
 class LoginViewModel : ViewModel() {
 
     var uiState by mutableStateOf(LoginModel())
         private set
 
-    // Actualiza el correo y limpia sus errores
     fun onCorreoChanged(valor: String) {
         uiState = uiState.copy(correo = valor, errorCorreo = "", errorGeneral = "")
     }
 
-    // Actualiza la contraseña y limpia sus errores
     fun onPasswordChanged(valor: String) {
         uiState = uiState.copy(password = valor, errorPassword = "", errorGeneral = "")
     }
 
-    // Si quedó una sesión guardada en Room entra directo; si no, muestra el formulario
     fun restaurarSesion(context: Context, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val db = AppDatabase.getDatabase(context)
@@ -44,7 +49,6 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Valida cada campo y devuelve true si no hay errores
     private fun validar(): Boolean {
         val correo = uiState.correo.trim().lowercase()
         val password = uiState.password
@@ -71,7 +75,6 @@ class LoginViewModel : ViewModel() {
         return !hayErrores
     }
 
-    // Valida, inicia sesión en el servidor y guarda la sesión en Room
     fun onLoginClick(context: Context, onSuccess: () -> Unit) {
         if (!validar()) return
 

@@ -3,7 +3,11 @@ package com.example.panol.ui.model
 import java.util.Calendar
 import java.util.TimeZone
 
-// Estado del Formulario: campos, un error por campo, advertencia de 3 horas y contador del temblor
+/*
+ * Estado del Formulario: campos, un error por campo, advertencia de 3 horas y contador del temblor.
+ *
+ * - fechaTexto: Fecha elegida como texto dd/MM/yyyy.
+ */
 data class SolicitudModel(
     val sala: String = "",
     val fechaMillis: Long = 0L,
@@ -20,7 +24,6 @@ data class SolicitudModel(
     val mostrarConfirmacion: Boolean = false,
     val errorTrigger: Int = 0
 ) {
-    // Fecha elegida como texto dd/MM/yyyy
     val fechaTexto: String
         get() {
             if (fechaMillis == 0L) return ""
